@@ -13,6 +13,7 @@ public class Relation {
 	private List<String> Attributes;
 	private List<Integer> maxDomain; //maximum value for that attribute
 	
+	
 	public Relation (List<String> att, List<Integer> max){
 		this.Attributes = att;
 		this.maxDomain = max;
@@ -118,7 +119,7 @@ public class Relation {
 			//create identifiers randomly without repetition
 			for (int i = 0; i<size; i++){
 				if (identValue.isEmpty()){
-					value = rnd.nextInt(size*2);
+					value = rnd.nextInt(size*2);	//we take as a range the double of the size of the partition of one attribute
 					identValue.add(value);
 				}
 				else {
@@ -142,6 +143,28 @@ public class Relation {
 		
 		return identifHshTbl;
 		
+	}
+	
+	
+	public ArrayList <String> mappingFunction(HashMap<String, List<Partition>> part, HashMap <String, List<Identifier>> ident, List<String> attributes){
+		ArrayList <String> mappedAttributes = new ArrayList<String>();
+		List<Partition> partTemp;
+		List<Identifier> identTemp;
+		Integer temp;
+		int position;
+		for (String att : attributes){
+			temp = Integer.parseInt(att);	//transform string of attributes in Integer
+			partTemp = part.get(att);		//retrieve the set of partition for this attribute
+			identTemp = ident.get(att);		//retrieve the set of identifier for this attribute
+			for (Partition p : partTemp){
+				position = partTemp.indexOf(p);
+				if(temp <= p.getUpperBound()){
+					Integer val = identTemp.get(position).getValue();
+					mappedAttributes.add(String.valueOf(val));
+				}
+			}
+		}
+		return mappedAttributes;	// return a list of mapped values of attributes using identifier and partition values
 	}
 	
 	

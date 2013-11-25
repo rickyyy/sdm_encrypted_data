@@ -6,11 +6,12 @@ TODO LIST:
 	- Phase Embedding:
 		- Shared Covering Sets
 - SQL Encryption:
-	- Relation Encryption and Storage Model (so far we have just the "normal" database, we have to change
+	++ Relation Encryption and Storage Model (so far we have just the "normal" database, we have to change
 	its settings using: etuple, etc...)
-	- Partition functions
-	- Identification functions
-	- Mapping functions
+	++ Partition functions
+	++ Identification functions
+	++ Mapping functions
+	- Fix String Conversion to Integers and Viceversa
 	- Storing Encrypted Data
 	- Decryption function
 	- Mapping Conditions
