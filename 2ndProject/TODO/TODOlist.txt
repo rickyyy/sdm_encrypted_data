@@ -1,1 +1,18 @@
-TODO LIST
+TODO LIST:
+- Report
+- Poset structure:
+	- Key assignment
+	- Key derivation
+	- Phase Embedding:
+		- Shared Covering Sets
+- SQL Encryption:
+	- Relation Encryption and Storage Model (so far we have just the "normal" database, we have to change
+	its settings using: etuple, etc...)
+	- Partition functions
+	- Identification functions
+	- Mapping functions
+	- Storing Encrypted Data
+	- Decryption function
+	- Mapping Conditions
+	- Implementing Relationsal Operators over Encrypted Relations
+- Final Presentation
