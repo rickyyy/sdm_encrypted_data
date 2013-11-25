@@ -1,10 +1,10 @@
 package eit.nl.utwente.sdm.encryptsql;
 
-public class Tuple{
+public class Partition{
 	private Integer lowerBound;
 	private Integer upperBound;
 	
-	public Tuple (Integer low, Integer up){
+	public Partition (Integer low, Integer up){
 		this.lowerBound = low;
 		this.upperBound = up;
 	}

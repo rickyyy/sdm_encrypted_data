@@ -7,12 +7,12 @@ import java.util.List;
 import org.junit.*;
 
 import eit.nl.utwente.sdm.encryptsql.Relation;
-import eit.nl.utwente.sdm.encryptsql.Tuple;
+import eit.nl.utwente.sdm.encryptsql.Partition;
 
 public class TestPartitionCreation {
 	@Test
-	public void TestPartitionCreation(){
-		HashMap<String, List<Tuple>> bucket;
+	public void test(){
+		HashMap<String, List<Partition>> bucket;
 		ArrayList<String> attributes = new ArrayList<String>();
 		attributes.add("Id");
 		attributes.add("name");
@@ -25,15 +25,15 @@ public class TestPartitionCreation {
 		domainParts.add(6);
 		
 		Relation r = new Relation(attributes, domain);
-		bucket = r.createPartition(attributes, domain, domainParts);
-		List<Tuple> res = bucket.get("Id");
-		List<Tuple> res2 = bucket.get("name");
+		bucket = r.partitionFunction(attributes, domain, domainParts);
+		List<Partition> res = bucket.get("Id");
+		List<Partition> res2 = bucket.get("name");
 		System.out.println(res2 + "\n");
 		Assert.assertEquals(6, res2.size());
 		Assert.assertEquals(3, res.size());
 		
-		Tuple check2 = res2.get(res2.size()-1);
-		Integer upbound = check2.getUpperBound();
+		Partition check2 = res2.get(res2.size()-1);
+		Integer upbound = check2.getUpperBound(); //check if the partition reach the upperbound
 		System.out.println("UPBOUND: "+upbound);
 		Integer domainExpected = 1000;
 		

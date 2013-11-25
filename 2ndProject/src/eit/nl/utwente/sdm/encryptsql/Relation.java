@@ -3,8 +3,8 @@ package eit.nl.utwente.sdm.encryptsql;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
-import javax.naming.PartialResultException;
 
 
 /* In our Database we have financial_data which is already in "encrypted" form.
@@ -51,10 +51,10 @@ public class Relation {
 		return rEncrypted;
 	}
 	
-	public HashMap<String, List<Tuple>> createPartition (List<String> attributes, List<Integer> maxDomain, List<Integer> domainParts){
+	public HashMap<String, List<Partition>> partitionFunction (List<String> attributes, List<Integer> maxDomain, List<Integer> domainParts){
 		
 		//create bucket ( Attribute, [list of partitions] )
-		HashMap<String, List<Tuple>> bucket = new HashMap<String, List<Tuple>>();
+		HashMap<String, List<Partition>> bucket = new HashMap<String, List<Partition>>();
 		Integer max;
 		Integer position;
 		Integer partNum;
@@ -66,7 +66,7 @@ public class Relation {
 			System.out.println("His max value is : " + max + "\n");
 			partNum = domainParts.get(position);	//take the elements in the same position to the attribute (related to it)
 			System.out.println("It should be divided in X parts : " + partNum + "\n");
-			ArrayList<Tuple> partitions = new ArrayList<Tuple>();
+			ArrayList<Partition> partitions = new ArrayList<Partition>();
 			
 			int valueRange = max / partNum; // to create equivalent partitions
 			int counterBot = 0;
@@ -79,12 +79,12 @@ public class Relation {
 			for (int i=1; i<=partNum; i++){
 				if (i == (partNum)){
 					counterUp = max;
-					Tuple p = new Tuple(counterBot, counterUp);
+					Partition p = new Partition(counterBot, counterUp);
 					System.out.println("( " + counterBot + "," + counterUp + " )\n");
 					partitions.add(p);
 				} else {
 					counterUp += valueRange;
-					Tuple p = new Tuple(counterBot, counterUp);
+					Partition p = new Partition(counterBot, counterUp);
 					System.out.println("( " + counterBot + "," + counterUp + " )\n");
 					counterBot = counterUp+1;
 					partitions.add(p);
@@ -97,4 +97,52 @@ public class Relation {
 		return bucket;
 		
 	}
+	
+	public HashMap <String, List<Identifier>> identificatioFunction(HashMap<String, List<Partition>> bucket, List<String> attributes){
+		
+		HashMap <String, List<Identifier>> identifHshTbl = new HashMap<String, List<Identifier>>();
+		
+		for (String att : attributes){			
+			List<Identifier> ident = new ArrayList<Identifier>();
+			List<Partition> partitionList = new ArrayList<Partition>();
+			partitionList = bucket.get(att);
+			
+			Random rnd = new Random();
+			int size = partitionList.size();
+			System.out.println("size : " + size);
+			
+			Integer position;
+			Integer value;
+			List<Integer> identValue = new ArrayList<Integer>();
+			
+			//create identifiers randomly without repetition
+			for (int i = 0; i<size; i++){
+				if (identValue.isEmpty()){
+					value = rnd.nextInt(size*2);
+					identValue.add(value);
+				}
+				else {
+					do{
+						value = rnd.nextInt(size*2);
+					} while (identValue.contains(value));
+					identValue.add(value);
+				}
+			}
+			
+			System.out.println("size of identValue : " + identValue.size());
+			// create identifiers for each partition		
+			for (Partition partition : partitionList){
+				position = partitionList.indexOf(partition);
+				Integer v = identValue.get(position);
+				Identifier ide = new Identifier(v);
+				ident.add(position, ide);
+			}
+			identifHshTbl.put(att, ident);
+		}
+		
+		return identifHshTbl;
+		
+	}
+	
+	
 }
