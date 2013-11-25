@@ -73,17 +73,18 @@ DROP TABLE IF EXISTS `financial_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `financial_data` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_cons` int(11) NOT NULL,
-  `id_client` int(11) NOT NULL,
-  `statement` varchar(45) DEFAULT NULL,
-  `investment` double DEFAULT NULL,
-  `interest_rate` float DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id_cons_idx` (`id_cons`),
-  KEY `id_client_idx` (`id_client`),
-  CONSTRAINT `id_cons` FOREIGN KEY (`id_cons`) REFERENCES `consultant` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `id_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  `etuple` varchar(255) NOT NULL,
+  `id_s` int(11) NOT NULL,
+  `id_cons_s` int(11) NOT NULL,
+  `id_client_s` int(11) NOT NULL,
+  `statement_s` varchar(45) DEFAULT NULL,
+  `investment_s` double DEFAULT NULL,
+  `interest_rate_s` float DEFAULT NULL,
+  PRIMARY KEY (`id_s`),
+  KEY `id_cons_idx` (`id_cons_s`),
+  KEY `id_client_idx` (`id_client_s`),
+  CONSTRAINT `id_cons` FOREIGN KEY (`id_cons_s`) REFERENCES `consultant` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `id_client` FOREIGN KEY (`id_client_s`) REFERENCES `client` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -105,4 +106,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-25 11:06:00
+-- Dump completed on 2013-11-25 17:14:50
