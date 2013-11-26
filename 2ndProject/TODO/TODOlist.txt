@@ -11,9 +11,9 @@ TODO LIST:
 	++ Partition functions
 	++ Identification functions
 	++ Mapping functions
-	- Fix String Conversion to Integers and Viceversa
+	++ Fix String Conversion to Integers and Viceversa
 	- Storing Encrypted Data
 	- Decryption function
 	- Mapping Conditions
 	- Implementing Relationsal Operators over Encrypted Relations
-- Final Presentation
+	- DB interaction
