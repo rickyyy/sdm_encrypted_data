@@ -16,9 +16,9 @@ public class TestPartitionCreation {
 		ArrayList<String> attributes = new ArrayList<String>();
 		attributes.add("Id");
 		attributes.add("name");
-		ArrayList<Integer> domain = new ArrayList<Integer>();
-		domain.add(100);
-		domain.add(1000);
+		ArrayList<Long> domain = new ArrayList<Long>();
+		domain.add((long)100);
+		domain.add((long)1000);
 		
 		ArrayList<Integer> domainParts = new ArrayList<Integer>();
 		domainParts.add(3);
@@ -33,11 +33,12 @@ public class TestPartitionCreation {
 		Assert.assertEquals(3, res.size());
 		
 		Partition check2 = res2.get(res2.size()-1);
-		Integer upbound = check2.getUpperBound(); //check if the partition reach the upperbound
-		System.out.println("UPBOUND: "+upbound);
+		Long upbound = check2.getUpperBound(); //check if the partition reach the upperbound
+		Integer convUpBound = upbound.intValue();
+		System.out.println("UPBOUND: "+convUpBound);
 		Integer domainExpected = 1000;
 		
-		Assert.assertEquals(domainExpected, upbound);
+		Assert.assertEquals(domainExpected, convUpBound);
 		
 	}
 }

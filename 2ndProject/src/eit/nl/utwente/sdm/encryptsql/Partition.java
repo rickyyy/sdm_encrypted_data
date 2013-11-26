@@ -1,19 +1,19 @@
 package eit.nl.utwente.sdm.encryptsql;
 
 public class Partition{
-	private Integer lowerBound;
-	private Integer upperBound;
+	private long lowerBound;
+	private long upperBound;
 	
-	public Partition (Integer low, Integer up){
+	public Partition (long low, long up){
 		this.lowerBound = low;
 		this.upperBound = up;
 	}
 
-	public Integer getLowerBound() {
+	public long getLowerBound() {
 		return lowerBound;
 	}
 
-	public Integer getUpperBound() {
+	public long getUpperBound() {
 		return upperBound;
 	}
 

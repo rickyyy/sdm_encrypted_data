@@ -23,9 +23,9 @@ public class TestIdentifierCreation {
 		ArrayList<String> attributes = new ArrayList<String>();
 		attributes.add("Id");
 		attributes.add("name");
-		ArrayList<Integer> domain = new ArrayList<Integer>();
-		domain.add(100);
-		domain.add(1000);
+		ArrayList<Long> domain = new ArrayList<Long>();
+		domain.add((long)100);
+		domain.add((long)1000);
 		ArrayList<Integer> domainParts = new ArrayList<Integer>();
 		domainParts.add(3);
 		domainParts.add(6);

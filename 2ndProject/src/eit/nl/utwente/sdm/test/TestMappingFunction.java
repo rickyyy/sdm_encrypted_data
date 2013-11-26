@@ -21,23 +21,26 @@ public class TestMappingFunction {
 		HashMap<String, List<Partition>> bucket;
 		HashMap <String, List<Identifier>> identifHshTbl;
 		ArrayList<String> mappedAttributes;
-		
 		ArrayList<String> attributes = new ArrayList<String>();
+		ArrayList<Long> domain = new ArrayList<Long>();
+		ArrayList<Integer> domainParts = new ArrayList<Integer>();
+		String string = "abcde";
+		
 		attributes.add("123");
 		int attPos = attributes.indexOf("123");
-		attributes.add("550");
-		int attPos1 = attributes.indexOf("550");
-		ArrayList<Integer> domain = new ArrayList<Integer>();
-		domain.add(1000);
-		domain.add(4000);
-		ArrayList<Integer> domainParts = new ArrayList<Integer>();
+		domain.add((long) 1000);
+		attributes.add(string);
+		int attPos1 = attributes.indexOf(string);
+		long x = 6428888932339941375L;
+		domain.add(x);
+		
 		domainParts.add(3);
-		domainParts.add(20);
+		domainParts.add(3);
 		
 		Relation r = new Relation(attributes, domain);
 		bucket = r.partitionFunction(attributes, domain, domainParts);
 		List<Partition> part1 = bucket.get("123");
-		List<Partition> part2 = bucket.get("550");
+		List<Partition> part2 = bucket.get(string);
 		identifHshTbl = r.identificatioFunction(bucket, attributes);
 		mappedAttributes = r.mappingFunction(bucket, identifHshTbl, attributes);
 		System.out.println("Mapped attribute size : " + mappedAttributes.size());
@@ -45,8 +48,11 @@ public class TestMappingFunction {
 		System.out.println("Attribute Id:");
 		System.out.println("Partition of Id:");
 		List<Identifier> list = identifHshTbl.get("123");
-		List<Identifier> list1 = identifHshTbl.get("550");
+		List<Identifier> list1 = identifHshTbl.get(string);
 
+		long mapString = r.attributesToInt(string);
+		System.out.println("INTEGER STRING : " + mapString);
+		
 		for (Partition p : part1){
 			int position = part1.indexOf(p);
 			Identifier i = list.get(position);
@@ -59,9 +65,11 @@ public class TestMappingFunction {
 			int position = part2.indexOf(p);
 			Identifier i = list1.get(position);
 			System.out.println("- " + p.toString() + " Identifier: " + i.toString());
+			if (mapString <= p.getUpperBound()){
+				System.out.println("TRUEEEEEEEEEEEEEEEEEE");
+			}
 		}
 		System.out.println("Mapped Attribute : " + mappedAttributes.get(attPos1));
-
 	}
 
 }

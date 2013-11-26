@@ -11,10 +11,10 @@ import java.util.Random;
  * */
 public class Relation {
 	private List<String> Attributes;
-	private List<Integer> maxDomain; //maximum value for that attribute
+	private List<Long> maxDomain; //maximum value for that attribute
 	
 	
-	public Relation (List<String> att, List<Integer> max){
+	public Relation (List<String> att, List<Long> max){
 		this.Attributes = att;
 		this.maxDomain = max;
 	}
@@ -23,11 +23,11 @@ public class Relation {
 		return r.Attributes;
 	}
 	
-	public List<Integer> getMaxDomain() {
+	public List<Long> getMaxDomain() {
 		return maxDomain;
 	}
 
-	public void setMaxDomain(List<Integer> maxDomain) {
+	public void setMaxDomain(List<Long> maxDomain) {
 		this.maxDomain = maxDomain;
 	}
 
@@ -35,7 +35,7 @@ public class Relation {
 		Attributes = attributes;
 	}
 	
-	private long attributesToInt(String s) {
+	public long attributesToInt(String s) {
 		long res = 0;
 		for(int i = 0; i<s.length(); i++){
 			res = res*76 + (int)s.charAt(i) - 47;
@@ -43,7 +43,7 @@ public class Relation {
 		return res;
 	}
 	
-	private String intToAttributes(long n) {
+	public String intToAttributes(long n) {
 		String res = "";
 		do {
 			long charp =  n % 76;
@@ -71,13 +71,14 @@ public class Relation {
 		return rEncrypted;
 	}
 	
-	public HashMap<String, List<Partition>> partitionFunction (List<String> attributes, List<Integer> maxDomain, List<Integer> domainParts){
+	public HashMap<String, List<Partition>> partitionFunction (List<String> attributes, List<Long> maxDomain, List<Integer> domainParts){
 		
 		//create bucket ( Attribute, [list of partitions] )
 		HashMap<String, List<Partition>> bucket = new HashMap<String, List<Partition>>();
-		Integer max;
+		long max;
 		Integer position;
 		Integer partNum;
+		
 		for (String att : attributes){
 			
 			System.out.println("Attributes analized now : " + att + "\n");
@@ -88,9 +89,9 @@ public class Relation {
 			System.out.println("It should be divided in X parts : " + partNum + "\n");
 			ArrayList<Partition> partitions = new ArrayList<Partition>();
 			
-			int valueRange = max / partNum; // to create equivalent partitions
-			int counterBot = 0;
-			int counterUp = 0;
+			long valueRange = max / partNum.longValue(); // to create equivalent partitions
+			long counterBot = 0;
+			long counterUp = 0;
 			
 			/* for each attribute:
 			 split the domain in partitions (value)
@@ -169,13 +170,13 @@ public class Relation {
 		ArrayList <String> mappedAttributes = new ArrayList<String>();
 		List<Partition> partTemp;
 		List<Identifier> identTemp;
-		Integer temp;
+		long temp;
 		int position;
 		for (String att : attributes){
-			temp = Integer.parseInt(att);	//transform string of attributes in Integer
+			temp = attributesToInt(att);	//transform string of attributes in Integer
 			partTemp = part.get(att);		//retrieve the set of partition for this attribute
 			identTemp = ident.get(att);		//retrieve the set of identifier for this attribute
-			for (Partition p : partTemp){
+			for (Partition p : partTemp){	//TODO THERE IS AN ERROR HERE!!!
 				position = partTemp.indexOf(p);
 				if(temp <= p.getUpperBound()){
 					Integer val = identTemp.get(position).getValue();
