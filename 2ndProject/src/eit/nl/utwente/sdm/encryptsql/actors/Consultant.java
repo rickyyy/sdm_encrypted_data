@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import eit.nl.utwente.sdm.encryptsql.DBUtils;
+import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 
 
 public class Consultant {
@@ -14,6 +14,7 @@ public class Consultant {
 	private int id;
 	private String name;
 	private String company;
+	private byte key[];
 	
 	public Consultant (int idCons, String nm, String cmp){
 		this.id = idCons;
@@ -106,6 +107,14 @@ public class Consultant {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public byte[] getKey() {
+		return key;
+	}
+
+	public void setKey(byte key[]) {
+		this.key = key;
 	}
 
 }

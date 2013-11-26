@@ -6,13 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import eit.nl.utwente.sdm.encryptsql.DBUtils;
+import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 
 
 public class Client {
+	
 	private int id;
 	private String name;
 	private String contact;
+	private byte key[];
 	
 	public Client(int idClient, String nm, String cnt){
 		this.id = idClient;
@@ -105,5 +107,13 @@ public class Client {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public byte[] getKey() {
+		return key;
+	}
+
+	public void setKey(byte key[]) {
+		this.key = key;
 	}
 }

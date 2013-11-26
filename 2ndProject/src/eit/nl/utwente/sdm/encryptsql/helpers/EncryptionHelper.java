@@ -1,4 +1,4 @@
-package eit.nl.utwente.sdm.encryptsql;
+package eit.nl.utwente.sdm.encryptsql.helpers;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;

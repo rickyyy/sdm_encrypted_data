@@ -5,7 +5,7 @@ import java.util.Random;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eit.nl.utwente.sdm.encryptsql.EncryptionHelper;
+import eit.nl.utwente.sdm.encryptsql.helpers.EncryptionHelper;
 
 public class TestEncDec {
 
