@@ -16,5 +16,11 @@ public class Partition{
 	public Integer getUpperBound() {
 		return upperBound;
 	}
+
+	@Override
+	public String toString() {
+		return "Partition [lowerBound=" + lowerBound + ", upperBound="
+				+ upperBound + "]";
+	}
 	
 }

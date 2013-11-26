@@ -34,6 +34,25 @@ public class Relation {
 	public void setAttributes(List<String> attributes) {
 		Attributes = attributes;
 	}
+	
+	private long attributesToInt(String s) {
+		long res = 0;
+		for(int i = 0; i<s.length(); i++){
+			res = res*76 + (int)s.charAt(i) - 47;
+		}
+		return res;
+	}
+	
+	private String intToAttributes(long n) {
+		String res = "";
+		do {
+			long charp =  n % 76;
+			char charpc = (char) (charp + 47);
+			res = charpc + res;
+			n = n / 76;
+		} while (n != 0);
+		return res;
+	}
 
 	public void addAttribute (Relation r, String s){
 		r.Attributes.add(s);
