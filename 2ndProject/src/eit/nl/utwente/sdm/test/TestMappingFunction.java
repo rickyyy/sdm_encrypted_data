@@ -24,18 +24,19 @@ public class TestMappingFunction {
 		ArrayList<String> attributes = new ArrayList<String>();
 		ArrayList<Long> domain = new ArrayList<Long>();
 		ArrayList<Integer> domainParts = new ArrayList<Integer>();
-		String string = "abcde";
+		String string = "zorronezz";
 		
 		attributes.add("123");
 		int attPos = attributes.indexOf("123");
-		domain.add((long) 1000);
+		long x = 6428888932339941375L;
+		domain.add(x);
 		attributes.add(string);
 		int attPos1 = attributes.indexOf(string);
-		long x = 6428888932339941375L;
+		
 		domain.add(x);
 		
 		domainParts.add(3);
-		domainParts.add(3);
+		domainParts.add(2);
 		
 		Relation r = new Relation(attributes, domain);
 		bucket = r.partitionFunction(attributes, domain, domainParts);
@@ -44,15 +45,15 @@ public class TestMappingFunction {
 		identifHshTbl = r.identificatioFunction(bucket, attributes);
 		mappedAttributes = r.mappingFunction(bucket, identifHshTbl, attributes);
 		System.out.println("Mapped attribute size : " + mappedAttributes.size());
-
+		String s = mappedAttributes.get(0);
 		System.out.println("Attribute Id:");
 		System.out.println("Partition of Id:");
 		List<Identifier> list = identifHshTbl.get("123");
 		List<Identifier> list1 = identifHshTbl.get(string);
 
-		long mapString = r.attributesToInt(string);
+		long mapString = r.attributesToInt("123");
 		System.out.println("INTEGER STRING : " + mapString);
-		
+		//21429629774466471
 		for (Partition p : part1){
 			int position = part1.indexOf(p);
 			Identifier i = list.get(position);
@@ -65,11 +66,12 @@ public class TestMappingFunction {
 			int position = part2.indexOf(p);
 			Identifier i = list1.get(position);
 			System.out.println("- " + p.toString() + " Identifier: " + i.toString());
-			if (mapString <= p.getUpperBound()){
+			if (mapString <= p.getUpperBound() && mapString >= p.getLowerBound()){
 				System.out.println("TRUEEEEEEEEEEEEEEEEEE");
 			}
 		}
 		System.out.println("Mapped Attribute : " + mappedAttributes.get(attPos1));
+
 	}
 
 }

@@ -172,13 +172,19 @@ public class Relation {
 		List<Identifier> identTemp;
 		long temp;
 		int position;
+		System.out.println("Attribute size = "+attributes.size());
 		for (String att : attributes){
 			temp = attributesToInt(att);	//transform string of attributes in Integer
 			partTemp = part.get(att);		//retrieve the set of partition for this attribute
 			identTemp = ident.get(att);		//retrieve the set of identifier for this attribute
+			System.out.println("inside for att");
+
 			for (Partition p : partTemp){	//TODO THERE IS AN ERROR HERE!!!
 				position = partTemp.indexOf(p);
-				if(temp <= p.getUpperBound()){
+				System.out.println("inside for part");
+
+				if(temp <= p.getUpperBound() && temp >= p.getLowerBound()){
+					System.out.println("Debug mapping function check upper lower bound");
 					Integer val = identTemp.get(position).getValue();
 					mappedAttributes.add(String.valueOf(val));
 				}
