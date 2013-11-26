@@ -1,3 +1,4 @@
+package eit.nl.utwente.sdm.encryptsql;
 
 
 import java.sql.Connection;
@@ -7,6 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import eit.nl.utwente.sdm.encryptsql.actors.Client;
+import eit.nl.utwente.sdm.encryptsql.actors.Consultant;
 
 public class DBUtils {
 

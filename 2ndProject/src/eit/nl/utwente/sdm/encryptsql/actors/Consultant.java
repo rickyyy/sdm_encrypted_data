@@ -1,3 +1,4 @@
+package eit.nl.utwente.sdm.encryptsql.actors;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -5,21 +6,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import eit.nl.utwente.sdm.encryptsql.DBUtils;
 
-public class Client {
+
+public class Consultant {
+	
 	private int id;
 	private String name;
-	private String contact;
+	private String company;
 	
-	public Client(int idClient, String nm, String cnt){
-		this.id = idClient;
+	public Consultant (int idCons, String nm, String cmp){
+		this.id = idCons;
 		this.name = nm;
-		this.contact = cnt;
+		this.company = cmp;
 	}
 	
-	public Client(String nm, String cnt){
+	public Consultant (String nm, String cmp){
 		this.name = nm;
-		this.contact = cnt;
+		this.company = cmp;
 	}
 	
 	public void setName(String newName){
@@ -30,12 +34,12 @@ public class Client {
 		return name;
 	}
 	
-	public void setContact(String newContact){
-		contact = newContact;
+	public void setCompany(String newCompany){
+		company = newCompany;
 	}
 	
-	public String getContact(){
-		return contact;
+	public String getCompany(){
+		return company;
 	}
 	
 	public int getId() {
@@ -50,15 +54,15 @@ public class Client {
 		Connection dbConnection = null;
 		PreparedStatement insertData = null;
 		String insertString = "insert into "
-				+ "client"
-				+ "(name, contact) VALUES"
+				+ "consultant"
+				+ "(name, company) VALUES"
 				+ "(?,?)";
 
 		try {
 			dbConnection = DBUtils.getDBConnection();
 			insertData = dbConnection.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS);
 			insertData.setString(1, name);
-			insertData.setString(2, contact);
+			insertData.setString(2, company);
 
 			// execute insert SQL statement
 			insertData.execute();
@@ -66,7 +70,7 @@ public class Client {
 			if (generatedKeys.next()) {
 				setId(generatedKeys.getInt(1));
 			}
-			System.out.println("New client was persisted");
+			System.out.println("New consultant was persisted");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -92,7 +96,7 @@ public class Client {
 		}
 		Connection dbConnection = null;
 		PreparedStatement sqlStatement = null;
-		String sqlString = "delete from client where id = ?";
+		String sqlString = "delete from consultant where id = ?";
 
 		try {
 			dbConnection = DBUtils.getDBConnection();
@@ -103,4 +107,5 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+
 }
