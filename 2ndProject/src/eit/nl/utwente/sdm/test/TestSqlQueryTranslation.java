@@ -1,23 +1,21 @@
-package eit.nl.utwente.sdm.encryptsql;
+package eit.nl.utwente.sdm.test;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.hsqldb.Server;
-import org.hsqldb.persist.HsqlProperties;
-import org.hsqldb.server.ServerAcl.AclFormatException;
+import org.junit.Test;
 
+import eit.nl.utwente.sdm.encryptsql.Demo;
+import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.actors.Client;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
 
-public class Demo {
+public class TestSqlQueryTranslation {
 
-	public static void main(String[] args) {
+	@Test
+	public void testQueryTranslation() {
 		ArrayList<String> attributes = new ArrayList<String>();
 		attributes.add("id_consultant");
 		attributes.add("id_client");
@@ -52,7 +50,7 @@ public class Demo {
 		domainParts.add(Integer.parseInt(partitionSt));
 
 		Relation r = new Relation(attributes, domain, domainParts);
-		Connection inMemoryDB = createInMemoryDBConn();
+		Connection inMemoryDB = Demo.createInMemoryDBConn();
 		eit.nl.utwente.sdm.encryptsql.actors.Server s = new eit.nl.utwente.sdm.encryptsql.actors.Server(r, DBUtils.getDBConnection());
 		Client c = new Client(s, r, inMemoryDB);
 		
@@ -62,53 +60,8 @@ public class Demo {
 			key[i] = (byte) (rn.nextDouble() * 255);
 		}
 		c.setKey(key);
-		c.store(1, 100, 30000, 2, "INVEST_ST");
+		c.store(1, 100, 12, 30000, "INVEST_STOCK");
+
 	}
-
-	public static Connection createInMemoryDBConn() {
-		try {
-			final Server hsqlServer = startServer();
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					hsqlServer.stop();
-				}
-			}));
-			Class.forName("org.hsqldb.jdbc.JDBCDriver");
-			Connection conn = DriverManager.getConnection(
-					"jdbc:hsqldb:hsql://localhost/xdb", "SA", "");
-			String createTable = "CREATE TABLE financial_data ( "
-					+ "id INTEGER NOT NULL,"
-					+ "id_cons INTEGER NOT NULL,"
-					+ "id_client INTEGER NOT NULL,"
-					+ "statement VARCHAR(10) NOT NULL,"
-					+ "investment INTEGER NOT NULL,"
-					+ "interest_rate INTEGER NOT NULL," + "PRIMARY KEY (id)"
-					+ ")";
-			PreparedStatement createTbStatement = conn
-					.prepareStatement(createTable);
-			createTbStatement.execute();
-		
-			return conn;
-		} catch (Exception e) {
-			System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public static Server startServer() throws IOException, AclFormatException {
-		HsqlProperties props = new HsqlProperties();
-		props.setProperty("server.database.0", "mem:test1");
-		props.setProperty("server.database.1", "mem:test2");
-		Server hsqlServer = new Server();
-		props.setProperty("server.dbname.0", "xdb");
-		hsqlServer.setRestartOnShutdown(false);
-		hsqlServer.setNoSystemExit(true);
-		hsqlServer.setProperties(props);
-		hsqlServer.start();
-		return hsqlServer;
-	}
-
+	
 }

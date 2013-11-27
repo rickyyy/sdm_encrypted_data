@@ -5,10 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.AttributedCharacterIterator.Attribute;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.lang.model.element.Element;
 
 import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
 import eit.nl.utwente.sdm.encryptsql.Relation;
+import eit.nl.utwente.sdm.encryptsql.WhereClause;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 
 public class Server {
@@ -54,8 +59,90 @@ public class Server {
 		} 
 	}
 
-	public List<EncryptedFinancialData> executeQueryEncData(String sql) {
-		return null;
+	/**
+	 * We accept only Attr1 <=> Val1, Attr1 <=> Attr2. AND / OR operators are not accepted 
+	 * 
+	 */
+	public List<EncryptedFinancialData> executeQueryEncData(String preparedSql) {
+		List<EncryptedFinancialData> result = new ArrayList<EncryptedFinancialData>();
+		String mappedQuery = Server.mapQuery(preparedSql, relation);
+		PreparedStatement prepSt;
+		try {
+			prepSt = connection.prepareStatement(mappedQuery, Statement.RETURN_GENERATED_KEYS);
+			ResultSet resultSet = prepSt.executeQuery();
+			while (resultSet.next()) {
+				int id = resultSet.getInt(1);
+				String etuple = resultSet.getString(2);
+				String idCons = resultSet.getInt(3) + "";
+				String idClient = resultSet.getInt(4) + "";
+				String stat = resultSet.getInt(5) + "";
+				String inv = resultSet.getInt(6) + "";
+				String interest = resultSet.getInt(7) + "";
+				EncryptedFinancialData efc = new EncryptedFinancialData(id, etuple, idCons, idClient, stat, inv, interest);
+				result.add(efc);
+			}
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static String mapQuery(String oldQuery, Relation relation) {
+		WhereClause wc = Server.decodeWhereClause(oldQuery, relation.getAttributes());
+		String resultQuery = "select * from financial_data ";
+		long value = 0;
+		if (!wc.secondIsAttr) {
+			if (wc.secondIsString) {
+				value = Relation.attributesToInt(wc.elements[1]);
+			} else {
+				value = Long.parseLong(wc.elements[1]);
+			}
+		}
+			
+		if (wc.operator == '=') {
+			if (wc.secondIsAttr) {
+			} else {
+				int mappedAttr = relation.mapSingleAttribute(wc.elements[0], value);
+				resultQuery += "where" + wc.elements[0] + "_s=" + value;
+			}
+		} else {
+			
+		}
+		return resultQuery;
+	}
+
+	public static WhereClause decodeWhereClause(String preparedSql, List<String> list) {
+		String expression = preparedSql.replaceAll(".*(where|WHERE)", "");
+		char operator = 0;
+		boolean secondIsAttr = false;
+		boolean secondIsString = false;
+		String elements[] = null;
+		if (expression.contains("=")) {
+			operator = '=';
+			elements = expression.split("=");
+			elements[0] = elements[0].trim();
+			elements[1] = elements[1].trim();
+		} else if (expression.contains("<")) {
+			operator = '<';
+			elements = expression.split("<");
+			elements[0] = elements[0].trim();
+			elements[1] = elements[1].trim();
+		} else if (expression.contains(">")) {
+			operator = '>';
+			elements = expression.split(">");
+			elements[0] = elements[0].trim();
+			elements[1] = elements[1].trim();
+		}
+		if (list.contains(elements[1])) {
+			secondIsAttr = true;
+		} else {
+			if (elements[1].contains("\'") || elements[1].contains("\"")) {
+				secondIsString = true;
+				elements[1] = elements[1].replaceAll("\'", "").replaceAll("\"", "");
+			}
+		}
+		return new WhereClause(operator, elements, secondIsAttr, secondIsString);
 	}
 
 }
