@@ -2,16 +2,23 @@ package eit.nl.utwente.sdm.encryptsql;
 
 import java.util.ArrayList;
 
+import eit.nl.utwente.sdm.encryptsql.actors.Client;
+import eit.nl.utwente.sdm.encryptsql.actors.Server;
 import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
 
 public class Demo {
 
 	public static void main(String[] args) {
 		ArrayList<String> attributes = new ArrayList<String>();
+		attributes.add("id_consultant");
+		attributes.add("id_client");
 		attributes.add("investment");
 		attributes.add("interest_rate");
 		attributes.add("statement");
 		ArrayList<Long> domain = new ArrayList<Long>();
+		String maxID = GlobalProperties.getInstance().getProperty("MAX_ID");
+		domain.add(Long.parseLong(maxID));
+		domain.add(Long.parseLong(maxID));
 		String maxInv = GlobalProperties.getInstance().getProperty("MAX_INVESTMENT");
 		String maxInt = GlobalProperties.getInstance().getProperty("MAX_INTEREST");
 		domain.add(Long.parseLong(maxInv));
@@ -19,6 +26,9 @@ public class Demo {
 		long maxS = Relation.getUpperLimitString();
 		domain.add(maxS);
 		ArrayList<Integer> domainParts = new ArrayList<Integer>();
+		String partitionID = GlobalProperties.getInstance().getProperty("NO_PARTITIONS_ID");
+		domainParts.add(Integer.parseInt(partitionID));
+		domainParts.add(Integer.parseInt(partitionID));
 		String partitionInv = GlobalProperties.getInstance().getProperty("NO_PARTITIONS_INVESTMENT");
 		domainParts.add(Integer.parseInt(partitionInv));
 		String partitionInt = GlobalProperties.getInstance().getProperty("NO_PARTITIONS_INTEREST_RATE");
@@ -28,6 +38,10 @@ public class Demo {
 		
 		Relation r = new Relation(attributes, domain, domainParts);
 		
+		Server s = new Server(r);
+		Client c = new Client(s, r);
+		
+		c.store(1, 100, 12, 30000, "INVEST_STOCK");
 	}
 	
 }

@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
+import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 
 
@@ -15,6 +17,13 @@ public class Client {
 	private String name;
 	private String contact;
 	private byte key[];
+	private Server server;
+	private Relation relation;
+	
+	public Client(Server s, Relation r) {
+		this.server = s;
+		this.relation = r;
+	}
 	
 	public Client(int idClient, String nm, String cnt){
 		this.id = idClient;
@@ -115,5 +124,11 @@ public class Client {
 
 	public void setKey(byte key[]) {
 		this.key = key;
+	}
+	
+	public void store(long idCons, long idClient, long interest, long investment, String statement) {
+		//TODO encrypt + mapping + create EncryptedFinancialData
+		EncryptedFinancialData ed = null;
+		server.store(ed);
 	}
 }

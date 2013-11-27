@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
 import eit.nl.utwente.sdm.encryptsql.actors.Client;
 import eit.nl.utwente.sdm.encryptsql.actors.Consultant;
 
@@ -34,7 +35,7 @@ public class DBUtils {
 		return dbConnection;
 	}
 
-	public static List<Consultant> getPatients() {
+	public static List<Consultant> getConsultants() {
 		List<Consultant> result = new ArrayList<Consultant>();
 		Connection dbConnection = getDBConnection();
 		PreparedStatement insertData = null;
@@ -76,5 +77,10 @@ public class DBUtils {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public List<EncryptedFinancialData> getFinancialData() {
+		//TODO 
+		return null;
 	}
 }
