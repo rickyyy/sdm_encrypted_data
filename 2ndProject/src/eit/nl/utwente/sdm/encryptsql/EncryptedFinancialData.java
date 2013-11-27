@@ -2,6 +2,7 @@ package eit.nl.utwente.sdm.encryptsql;
 
 
 public class EncryptedFinancialData {
+	private int id;
 	private String etuple;
 	private String idCons;
 	private String idClient;
@@ -26,44 +27,57 @@ public class EncryptedFinancialData {
 		this.etuple = etuple;
 	}
 
-	public String getIdCons() {
-		return idCons;
+	public int getIdCons() {
+		int id = Integer.parseInt(this.idCons);
+		return id;
 	}
 
 	public void setIdCons(String idCons) {
 		this.idCons = idCons;
 	}
 
-	public String getIdClient() {
-		return idClient;
+	public int getIdClient() {
+		int id = Integer.parseInt(this.idClient);
+		return id;
 	}
 
 	public void setIdClient(String idClient) {
 		this.idClient = idClient;
 	}
 
-	public String getInterest() {
-		return interest;
+	public int getInterest() {
+		int id = Integer.parseInt(this.interest);
+		return id;
 	}
 
 	public void setInterest(String interest) {
 		this.interest = interest;
 	}
 
-	public String getInvestment() {
-		return investment;
+	public int getInvestment() {
+		int id = Integer.parseInt(this.investment);
+		return id;	
 	}
 
 	public void setInvestment(String investment) {
 		this.investment = investment;
 	}
 
-	public String getStatement() {
-		return statement;
+	public int getStatement() {
+		int id = Integer.parseInt(this.statement);
+		return id;
 	}
 
 	public void setStatement(String statement) {
 		this.statement = statement;
+	}
+
+	public void setId(int int1) {
+		this.id = int1;
+	}
+	
+	public int getId(){
+		return this.id;
 	}
 	
 }
