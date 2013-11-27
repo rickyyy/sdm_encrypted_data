@@ -1,4 +1,4 @@
-package eit.nl.utwente.sdm.encryptsql;
+package eit.nl.utwente.sdm.test;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,14 +11,19 @@ import java.util.Random;
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
 import org.hsqldb.server.ServerAcl.AclFormatException;
+import org.junit.Assert;
+import org.junit.Test;
 
+import eit.nl.utwente.sdm.encryptsql.FinancialData;
+import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.actors.Client;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
 
-public class Demo {
+public class TestSearchInEncData {
 
-	public static void main(String[] args) {
+	@Test
+	public void testSimpleSearch() {
 		ArrayList<String> attributes = new ArrayList<String>();
 		attributes.add("id_consultant");
 		attributes.add("id_client");
@@ -64,9 +69,22 @@ public class Demo {
 		}
 		c.setKey(key);
 		c.store(1, 100, 30000, 2, "INVEST_ST");
+		c.store(1, 100, 3000, 5, "GAMBLING");
+		c.store(1, 100, 40000, 5, "STOCK");
+		c.store(1, 100, 15000, 5, "STOCK");
 		List<FinancialData> result = c.searchEncData("select * from financial_data where investment=30000");
-		System.out.println(result.size());
-		System.out.println(result.get(0).statement);
+		Assert.assertSame(result.size(), 1);
+		Assert.assertTrue(result.get(0).statement.equals("INVEST_ST"));
+		Assert.assertTrue(result.get(0).interest == 2);
+		Assert.assertTrue(result.get(0).investment == 30000);
+		Assert.assertTrue(result.get(0).idCons == 1);
+		Assert.assertTrue(result.get(0).idClient == 100);
+		result = c.searchEncData("select * from financial_data where investment<30000");
+		Assert.assertSame(result.size(), 2);
+		result = c.searchEncData("select * from financial_data where investment>10");
+		Assert.assertSame(result.size(), 4);
+		result = c.searchEncData("select * from financial_data where investment<51000");
+		Assert.assertSame(result.size(), 4);
 		
 	}
 

@@ -50,7 +50,7 @@ public class Server {
 			if (generatedKeys.next()) {
 				ed.setId(generatedKeys.getInt(1));
 			}
-			System.out.println("New client was persisted");
+			System.out.println("New encrypted financial data was persisted");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -66,6 +66,7 @@ public class Server {
 	public List<EncryptedFinancialData> executeQueryEncData(String preparedSql) {
 		List<EncryptedFinancialData> result = new ArrayList<EncryptedFinancialData>();
 		String mappedQuery = Server.mapQuery(preparedSql, relation);
+		System.out.println("SERVER SIDE QUERY: " + mappedQuery);
 		PreparedStatement prepSt;
 		try {
 			prepSt = connection.prepareStatement(mappedQuery, Statement.RETURN_GENERATED_KEYS);
@@ -104,7 +105,7 @@ public class Server {
 			if (wc.secondIsAttr) {
 			} else {
 				int mappedAttr = relation.mapSingleAttribute(wc.elements[0], value);
-				resultQuery += "where" + wc.elements[0] + "_s=" + value;
+				resultQuery += "where " + wc.elements[0] + "_s=" + mappedAttr;
 			}
 		} else {
 			

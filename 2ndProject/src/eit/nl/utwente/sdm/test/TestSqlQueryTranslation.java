@@ -60,7 +60,7 @@ public class TestSqlQueryTranslation {
 			key[i] = (byte) (rn.nextDouble() * 255);
 		}
 		c.setKey(key);
-		c.store(1, 100, 12, 30000, "INVEST_STOCK");
+		
 
 	}
 	

@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
+
 import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
 import eit.nl.utwente.sdm.encryptsql.FinancialData;
 import eit.nl.utwente.sdm.encryptsql.Relation;
@@ -133,15 +135,15 @@ public class Client {
 	
 	public String etuplePreparation (long idCons, long idClient, long interest, long investment, String statement){
 		String s = "";
-		s.concat(String.valueOf(idCons));
-		s.concat("-");
-		s.concat(String.valueOf(idClient));
-		s.concat("-");
-		s.concat(String.valueOf(interest));
-		s.concat("-");
-		s.concat(String.valueOf(investment));
-		s.concat("-");
-		s.concat(statement);
+		s += String.valueOf(idCons);
+		s += "-";
+		s += String.valueOf(idClient);
+		s += "-";
+		s += String.valueOf(interest);
+		s += "-";
+		s += String.valueOf(investment);
+		s += "-";
+		s += statement;
 		
 		return s;
 	}
@@ -169,9 +171,10 @@ public class Client {
 		
 		//Encryption of etuple		
 		System.out.println("Encrypting etuple: .....");
-		EncryptionHelper help = new EncryptionHelper();
 		s = etuplePreparation(idCons, idClient, interest, investment, statement);
-		etuple = help.encrypt(s, this.key);
+		System.out.println("Etuple: " + s);
+		etuple = EncryptionHelper.encrypt(s, this.key);
+		System.out.println("Enc etuple: " + etuple);
 		
 		//Mapping Function
 		System.out.println("Applying Mapping Function: .....");
@@ -184,8 +187,8 @@ public class Client {
 		System.out.println("Creating Encrypted Financial Data: .....");
 		String idConsEFD= mappedValues.get(0);
 		String idClientEFD= mappedValues.get(1);
-		String interestEFD = mappedValues.get(2);
-		String investmentEFD = mappedValues.get(3);
+		String interestEFD = mappedValues.get(3);
+		String investmentEFD = mappedValues.get(2);
 		String statementEFD = mappedValues.get(4);
 		EncryptedFinancialData ed = new EncryptedFinancialData(etuple, idConsEFD, idClientEFD, interestEFD, investmentEFD, statementEFD);
 		System.out.println("Id of consultant: " + idClientEFD);
@@ -200,6 +203,7 @@ public class Client {
 	public List<FinancialData> searchEncData(String sql) {
 		/* Execute query on server side */
 		List<EncryptedFinancialData> resultFromServer = server.executeQueryEncData(sql);
+		System.out.println("RESULTS RECEIVED BY SERVER: " + resultFromServer);
 		/* Insert the values received from server in the virtual DB*/
 		String insertSQL = "insert into "
 				+ "financial_data"
@@ -211,14 +215,19 @@ public class Client {
 					.prepareStatement(insertSQL);
 			for (EncryptedFinancialData encFD : resultFromServer) {
 				String decryptedTouple = EncryptionHelper.decrypt(encFD.getEtuple(), key);
+				System.out.println("DECRYPTED ETUPLE: " + decryptedTouple);
 				List<String> etupleElements = getElementsOfEtuple(decryptedTouple);
+				if (etupleElements.size() != 5) {
+					continue;
+				}
 				insertStatement.setInt(1, encFD.getId());
 				insertStatement.setString(2, etupleElements.get(4));
-				insertStatement.setString(3, etupleElements.get(3));
-				insertStatement.setString(4, etupleElements.get(2));
+				insertStatement.setString(3, etupleElements.get(2));
+				insertStatement.setString(4, etupleElements.get(3));
 				insertStatement.setString(5, etupleElements.get(1));
 				insertStatement.setString(6, etupleElements.get(0));
 				insertStatement.execute();
+				System.out.println("INSERTED ONE ROW IN VIRTUAL TABLE");
 			}
 			/* Execute initial query on the virtual DB and return results*/
 			List<FinancialData> result = new ArrayList<FinancialData>();
