@@ -1,10 +1,11 @@
 TODO LIST:
 - Report
-- Poset structure:
-	- Key assignment
-	- Key derivation
-	- Phase Embedding:
-		- Shared Covering Sets
+++ Poset structure:
+	++ Key assignment
+	++ Key derivation
+	- Key should stored in bytes
+	- methods for map client and consultants directly in NodeX and generate the poset
+	
 - SQL Encryption:
 	++ Relation Encryption and Storage Model (so far we have just the "normal" database, we have to change
 	its settings using: etuple, etc...)
