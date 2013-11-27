@@ -2,6 +2,7 @@ package eit.nl.utwente.sdm.encryptsql;
 
 
 public class EncryptedFinancialData {
+	
 	private int id;
 	private String etuple;
 	private String idCons;
@@ -11,6 +12,16 @@ public class EncryptedFinancialData {
 	private String statement;
 	
 	public EncryptedFinancialData (String et, String idConsEFD, String idClientEFD, String interestEFD, String investmentEFD, String statementEFD){
+		this.etuple = et;
+		this.idCons = idConsEFD;
+		this.idClient = idClientEFD;
+		this.interest = interestEFD;
+		this.investment = investmentEFD;
+		this.statement = statementEFD;
+	}
+	
+	public EncryptedFinancialData (int id, String et, String idConsEFD, String idClientEFD, String interestEFD, String investmentEFD, String statementEFD){
+		this.id = id;
 		this.etuple = et;
 		this.idCons = idConsEFD;
 		this.idClient = idClientEFD;

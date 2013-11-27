@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
 import eit.nl.utwente.sdm.encryptsql.Relation;
@@ -51,6 +52,10 @@ public class Server {
 			System.out.println(e.getMessage());
 
 		} 
+	}
+
+	public List<EncryptedFinancialData> executeQueryEncData(String sql) {
+		return null;
 	}
 
 }
