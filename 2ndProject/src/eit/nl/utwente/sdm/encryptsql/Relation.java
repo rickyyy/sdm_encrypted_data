@@ -11,15 +11,15 @@ import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
  * */
 public class Relation {
 
-	private HashMap<String, List<Partition>> bucket;
+	private HashMap<String, List<Partition>> buckets;
 	private HashMap<String, List<Identifier>> identificatioFunction;
 	private List<String> attributes;
 
 	public Relation(List<String> attributes, List<Long> domain,
 			ArrayList<Integer> domainParts) {
 		this.attributes = attributes;
-		bucket = partitionFunction(attributes, domain, domainParts);
-		identificatioFunction = identificatioFunction(bucket, attributes);
+		buckets = partitionFunction(attributes, domain, domainParts);
+		identificatioFunction = identificatioFunction(buckets, attributes);
 	}
 
 	public static long attributesToInt(String s) {
@@ -179,7 +179,7 @@ public class Relation {
 				temp = value;
 			}
 			String attribute = attributes.get(i);
-			partTemp = bucket.get(attribute); // retrieve the set of partition
+			partTemp = buckets.get(attribute); // retrieve the set of partition
 												// for this attribute
 			identTemp = identificatioFunction.get(attribute); // retrieve the
 																// set of
@@ -208,7 +208,7 @@ public class Relation {
 	}
 
 	public int mapSingleAttribute(String attribute, Long value) {
-		List<Partition> partTemp = bucket.get(attribute);
+		List<Partition> partTemp = buckets.get(attribute);
 		List<Identifier> identTemp = identificatioFunction.get(attribute);
 
 		for (Partition p : partTemp) {
@@ -231,6 +231,14 @@ public class Relation {
 				return i;
 		}
 		return -1;
+	}
+
+	public List<Identifier> getIdentifiers(String attribute) {
+		return identificatioFunction.get(attribute);
+	}
+
+	public List<Partition> getPartitions(String attribute) {
+		return buckets.get(attribute);
 	}
 
 }

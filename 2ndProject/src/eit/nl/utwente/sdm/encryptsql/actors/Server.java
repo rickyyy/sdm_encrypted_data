@@ -12,6 +12,8 @@ import java.util.List;
 import javax.lang.model.element.Element;
 
 import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
+import eit.nl.utwente.sdm.encryptsql.Identifier;
+import eit.nl.utwente.sdm.encryptsql.Partition;
 import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.WhereClause;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
@@ -107,9 +109,43 @@ public class Server {
 				int mappedAttr = relation.mapSingleAttribute(wc.elements[0], value);
 				resultQuery += "where " + wc.elements[0] + "_s=" + mappedAttr;
 			}
-		} else {
-			
-		}
+		} else if (wc.operator == '>') {
+			if (wc.secondIsAttr) {
+			} else {
+				List<Partition> partitions = relation.getPartitions(wc.elements[0]);
+				List<Identifier> identifiers = relation.getIdentifiers(wc.elements[0]);
+				boolean first = true;
+				for (int i = 0; i < partitions.size(); i++) {
+					Partition p = partitions.get(i);
+					if (p.getUpperBound() >= value) {
+						if (first) {
+							resultQuery += "where " + wc.elements[0] + "_s=" + identifiers.get(i).getValue();
+							first = false;
+						} else {
+							resultQuery += " or " + wc.elements[0] + "_s=" + identifiers.get(i).getValue();
+						}
+					}
+				}
+			}
+		} else if (wc.operator == '<') {
+			if (wc.secondIsAttr) {
+			} else {
+				List<Partition> partitions = relation.getPartitions(wc.elements[0]);
+				List<Identifier> identifiers = relation.getIdentifiers(wc.elements[0]);
+				boolean first = true;
+				for (int i = 0; i < partitions.size(); i++) {
+					Partition p = partitions.get(i);
+					if (p.getLowerBound() <= value) {
+						if (first) {
+							resultQuery += "where " + wc.elements[0] + "_s=" + identifiers.get(i).getValue();
+							first = false;
+						} else {
+							resultQuery += " or " + wc.elements[0] + "_s=" + identifiers.get(i).getValue();
+						}
+					}
+				}
+			}
+		} 
 		return resultQuery;
 	}
 

@@ -85,6 +85,8 @@ public class TestSearchInEncData {
 		Assert.assertSame(result.size(), 4);
 		result = c.searchEncData("select * from financial_data where investment<51000");
 		Assert.assertSame(result.size(), 4);
+		result = c.searchEncData("select * from financial_data where investment>14999");
+		Assert.assertSame(result.size(), 3);
 		
 	}
 

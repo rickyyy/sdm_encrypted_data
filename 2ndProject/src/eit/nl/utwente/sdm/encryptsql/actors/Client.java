@@ -215,19 +215,21 @@ public class Client {
 					.prepareStatement(insertSQL);
 			for (EncryptedFinancialData encFD : resultFromServer) {
 				String decryptedTouple = EncryptionHelper.decrypt(encFD.getEtuple(), key);
-				System.out.println("DECRYPTED ETUPLE: " + decryptedTouple);
-				List<String> etupleElements = getElementsOfEtuple(decryptedTouple);
-				if (etupleElements.size() != 5) {
-					continue;
+				if (decryptedTouple != null) {
+					System.out.println("DECRYPTED ETUPLE: " + decryptedTouple);
+					List<String> etupleElements = getElementsOfEtuple(decryptedTouple);
+					if (etupleElements.size() != 5) {
+						continue;
+					}
+					insertStatement.setInt(1, encFD.getId());
+					insertStatement.setString(2, etupleElements.get(4));
+					insertStatement.setString(3, etupleElements.get(2));
+					insertStatement.setString(4, etupleElements.get(3));
+					insertStatement.setString(5, etupleElements.get(1));
+					insertStatement.setString(6, etupleElements.get(0));
+					insertStatement.execute();
+					System.out.println("INSERTED ONE ROW IN VIRTUAL TABLE");
 				}
-				insertStatement.setInt(1, encFD.getId());
-				insertStatement.setString(2, etupleElements.get(4));
-				insertStatement.setString(3, etupleElements.get(2));
-				insertStatement.setString(4, etupleElements.get(3));
-				insertStatement.setString(5, etupleElements.get(1));
-				insertStatement.setString(6, etupleElements.get(0));
-				insertStatement.execute();
-				System.out.println("INSERTED ONE ROW IN VIRTUAL TABLE");
 			}
 			/* Execute initial query on the virtual DB and return results*/
 			List<FinancialData> result = new ArrayList<FinancialData>();
