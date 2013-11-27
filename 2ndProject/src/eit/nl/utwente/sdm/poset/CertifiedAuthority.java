@@ -41,6 +41,12 @@ public class CertifiedAuthority {
 		g = new Integer(0);
 		Random rn = new Random();
 		g = rn.nextInt(prime);
-		// TODO finish it!
+
+		//VirtualNodes and ConsultNode don't have parents! they are MAX(P) p.173 book
+		for (NodeX x : p.nodeList){
+			if((x.getFlag()==1) || (x.getFlag()==0)){
+				
+			}
+		}
 	}
 }

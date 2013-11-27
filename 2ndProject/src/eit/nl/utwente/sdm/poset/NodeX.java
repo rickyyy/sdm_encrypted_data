@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 //Every client is an independent User Class (following the definition in the paper)
 public class NodeX {
+	private int flag; //if 0 is a Virtual Node, if 1 is Consultant, if 2 is Client
 	private int identifier;
 	private int publicKey;
 	private int privateKey;
@@ -14,12 +15,18 @@ public class NodeX {
 	private ArrayList<Edge> relations;
 
 	//Constructor for client user classes
-	public NodeX(int clientOrConsId){
+	public NodeX(int clientOrConsId, int f){
 		this.identifier = clientOrConsId;
+		this.flag = f;
 	}
 	
-	//Virtual node doesn't have any identifier
-	public NodeX(){
+	public int getFlag() {
+		return flag;
+	}
+
+	//Virtual node doesn't have any identifier.
+	public NodeX(int f){
+		this.flag = f;
 	}
 	
 	public NodeX getParentConsul() {
