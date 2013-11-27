@@ -70,12 +70,9 @@ public class Relation {
 		
 		for (String att : attributes){
 			
-			System.out.println("Attributes analized now : " + att + "\n");
 			position = attributes.indexOf(att);
 			max = maxDomain.get(position);	//take the elements in the same position to the attribute (related to it)
-			System.out.println("His max value is : " + max + "\n");
 			partNum = domainParts.get(position);	//take the elements in the same position to the attribute (related to it)
-			System.out.println("It should be divided in X parts : " + partNum + "\n");
 			ArrayList<Partition> partitions = new ArrayList<Partition>();
 			
 			long valueRange = max / partNum.longValue(); // to create equivalent partitions
@@ -90,12 +87,12 @@ public class Relation {
 				if (i == (partNum)){
 					counterUp = max;
 					Partition p = new Partition(counterBot, counterUp);
-					System.out.println("( " + counterBot + "," + counterUp + " )\n");
+//					System.out.println("( " + counterBot + "," + counterUp + " )\n");
 					partitions.add(p);
 				} else {
 					counterUp += valueRange;
 					Partition p = new Partition(counterBot, counterUp);
-					System.out.println("( " + counterBot + "," + counterUp + " )\n");
+//					System.out.println("( " + counterBot + "," + counterUp + " )\n");
 					counterBot = counterUp+1;
 					partitions.add(p);
 				}
@@ -119,7 +116,6 @@ public class Relation {
 			
 			Random rnd = new Random();
 			int size = partitionList.size();
-			System.out.println("size : " + size);
 			
 			Integer position;
 			Integer value;
@@ -139,7 +135,6 @@ public class Relation {
 				}
 			}
 			
-			System.out.println("size of identValue : " + identValue.size());
 			// create identifiers for each partition		
 			for (Partition partition : partitionList){
 				position = partitionList.indexOf(partition);
@@ -161,7 +156,7 @@ public class Relation {
 		List<Identifier> identTemp;
 		Comparable temp;
 		int position;
-		System.out.println("Attribute size = "+values.size());
+		System.out.println("Value size = "+values.size());
 		for (int i = 0; i < values.size(); i++){
 			Comparable value = values.get(i);
 			if (value instanceof String) {
@@ -179,7 +174,6 @@ public class Relation {
 //				System.out.println("inside for part");
 				
 				if((temp.compareTo(p.getUpperBound()) <= 0) && (temp.compareTo(p.getLowerBound()) >= 0)){
-					System.out.println("Debug mapping function check upper lower bound");
 					Integer val = identTemp.get(position).getValue();
 					mappedAttributes.add(String.valueOf(val));
 				}

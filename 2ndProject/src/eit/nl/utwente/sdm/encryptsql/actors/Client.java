@@ -157,25 +157,9 @@ public class Client {
 		return list;
 	}
 	
-	public void preparationEFD (String idConsEFD, String idClientEFD, String interestEFD, String investmentEFD, String statementEFD, ArrayList<String> mappedValues){
-		int i;
-		for (i = 0;i<mappedValues.size();i++){
-			if(i == 0){
-				idConsEFD = mappedValues.get(i);
-			}
-			else if (i == 1){
-				idClientEFD = mappedValues.get(i);
-			}
-			else if (i == 2){
-				interestEFD = mappedValues.get(i);
-			}
-			else if (i == 3){
-				investmentEFD = mappedValues.get(i);
-			}
-			else {
-				statementEFD = mappedValues.get(i);
-			}
-		}
+	public String preparationEFD (String s, ArrayList<String> mappedValues, int pos){
+		s = s + mappedValues.get(pos);
+		return s;
 	}
 	
 	public void store(long idCons, long idClient, long interest, long investment, String statement) {
@@ -184,27 +168,36 @@ public class Client {
 		ArrayList<Comparable> listValues;
 		ArrayList<String> mappedValues;
 		
-		String idConsEFD = "";
-		String idClientEFD= "";
-		String interestEFD = "";
-		String investmentEFD = "";
-		String statementEFD = "";
-		
-		//Encryption of etuple
+		//Encryption of etuple		
+		System.out.println("Encrypting etuple: .....");
 		EncryptionHelper help = new EncryptionHelper();
 		s = etuplePreparation(idCons, idClient, interest, investment, statement);
 		etuple = help.encrypt(s, this.key);
 		
 		//Mapping Function
+		System.out.println("Applying Mapping Function: .....");
 		listValues = preparationMapping(idCons, idClient, interest, investment, statement);
-		mappedValues = this.relation.mappingFunction(listValues);
-		preparationEFD(idConsEFD, idClientEFD, interestEFD, investmentEFD, statementEFD, mappedValues);
-
+		System.out.println("ListValues = " + listValues);
+		mappedValues = relation.mappingFunction(listValues);
+		System.out.println("Mapped Values : " + mappedValues + "\nMapping Size : " + mappedValues.size());
+		
 		//create EncryptedFinancialData
+		System.out.println("Creating Encrypted Financial Data: .....");
+		String idConsEFD= mappedValues.get(0);
+		String idClientEFD= mappedValues.get(1);
+		String interestEFD = mappedValues.get(2);
+		String investmentEFD = mappedValues.get(3);
+		String statementEFD = mappedValues.get(4);
 		EncryptedFinancialData ed = new EncryptedFinancialData(etuple, idConsEFD, idClientEFD, interestEFD, investmentEFD, statementEFD);
+		System.out.println("Id of consultant: " + idClientEFD);
+		System.out.println(ed.toString());
 		server.store(ed);
 	}
 	
+	public void setServer(Server server) {
+		this.server = server;
+	}
+
 	public List<FinancialData> searchEncData(String sql) {
 		/* Execute query on server side */
 		List<EncryptedFinancialData> resultFromServer = server.executeQueryEncData(sql);
