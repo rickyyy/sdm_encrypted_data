@@ -39,8 +39,16 @@ public class EncryptedFinancialData {
 	}
 
 	public int getIdCons() {
-		int id = Integer.parseInt(this.idCons);
+		int id = Integer.parseInt(idCons);
 		return id;
+	}
+
+	@Override
+	public String toString() {
+		return "EncryptedFinancialData [etuple=" + etuple + ", idCons="
+				+ idCons + ", idClient=" + idClient + ", interest=" + interest
+				+ ", investment=" + investment + ", statement=" + statement
+				+ "]";
 	}
 
 	public void setIdCons(String idCons) {
