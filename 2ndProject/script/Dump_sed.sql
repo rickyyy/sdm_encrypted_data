@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS `client`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `client` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_consultant` int(11) NOT NULL,
   `name` varchar(45) NOT NULL,
   `contact` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
@@ -83,7 +84,7 @@ CREATE TABLE `financial_data` (
   PRIMARY KEY (`id`),
   KEY `id_cons_idx` (`id_cons_s`),
   KEY `id_client_idx` (`id_client_s`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,6 +93,7 @@ CREATE TABLE `financial_data` (
 
 LOCK TABLES `financial_data` WRITE;
 /*!40000 ALTER TABLE `financial_data` DISABLE KEYS */;
+INSERT INTO `financial_data` VALUES (2,'Y4/pAmBHkqYK7HVDenqmzQ==',5,680,2376,18,9);
 /*!40000 ALTER TABLE `financial_data` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -104,4 +106,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-27 15:09:46
+-- Dump completed on 2013-11-27 18:05:26
