@@ -5,10 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
 import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
+import eit.nl.utwente.sdm.encryptsql.helpers.EncryptionHelper;
 
 
 public class Client {
@@ -126,9 +128,76 @@ public class Client {
 		this.key = key;
 	}
 	
+	public String etuplePreparation (long idCons, long idClient, long interest, long investment, String statement){
+		String s = "";
+		s.concat(String.valueOf(idCons));
+		s.concat("-");
+		s.concat(String.valueOf(idClient));
+		s.concat("-");
+		s.concat(String.valueOf(interest));
+		s.concat("-");
+		s.concat(String.valueOf(investment));
+		s.concat("-");
+		s.concat(statement);
+		
+		return s;
+	}
+	
+	public ArrayList<Comparable> preparationMapping (long idCons, long idClient, long interest, long investment, String statement){
+		ArrayList<Comparable> list = new ArrayList<Comparable>();
+		list.add(idCons);
+		list.add(idClient);
+		list.add(interest);
+		list.add(investment);
+		list.add(statement);
+		return list;
+	}
+	
+	public void preparationEFD (String idConsEFD, String idClientEFD, String interestEFD, String investmentEFD, String statementEFD, ArrayList<String> mappedValues){
+		int i;
+		for (i = 0;i<mappedValues.size();i++){
+			if(i == 0){
+				idConsEFD = mappedValues.get(i);
+			}
+			else if (i == 1){
+				idClientEFD = mappedValues.get(i);
+			}
+			else if (i == 2){
+				interestEFD = mappedValues.get(i);
+			}
+			else if (i == 3){
+				investmentEFD = mappedValues.get(i);
+			}
+			else {
+				statementEFD = mappedValues.get(i);
+			}
+		}
+	}
+	
 	public void store(long idCons, long idClient, long interest, long investment, String statement) {
-		//TODO encrypt + mapping + create EncryptedFinancialData
-		EncryptedFinancialData ed = null;
+		String s;
+		String etuple;
+		ArrayList<Comparable> listValues;
+		ArrayList<String> mappedValues;
+		
+		String idConsEFD = "";
+		String idClientEFD= "";
+		String interestEFD = "";
+		String investmentEFD = "";
+		String statementEFD = "";
+		
+		//Encryption of etuple
+		EncryptionHelper help = new EncryptionHelper();
+		s = etuplePreparation(idCons, idClient, interest, investment, statement);
+		etuple = help.encrypt(s, this.key);
+		
+		//Mapping Function
+		listValues = preparationMapping(idCons, idClient, interest, investment, statement);
+		mappedValues = this.relation.mappingFunction(listValues);
+		preparationEFD(idConsEFD, idClientEFD, interestEFD, investmentEFD, statementEFD, mappedValues);
+
+		//create EncryptedFinancialData
+		EncryptedFinancialData ed = new EncryptedFinancialData(etuple, idConsEFD, idClientEFD, interestEFD, investmentEFD, statementEFD);
 		server.store(ed);
 	}
 }

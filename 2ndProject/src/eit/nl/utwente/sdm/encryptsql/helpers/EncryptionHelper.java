@@ -27,7 +27,8 @@ public class EncryptionHelper {
 	            final String decryptedString = new String(cipher.doFinal(Base64.decodeBase64(strToDecrypt)));
 	            return decryptedString;
 	        } catch (Exception e) {
-	            return null;
+	            e.printStackTrace();
+	        	return null;
 	        }
 	    }
 

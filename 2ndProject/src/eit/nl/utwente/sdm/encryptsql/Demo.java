@@ -1,6 +1,7 @@
 package eit.nl.utwente.sdm.encryptsql;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import eit.nl.utwente.sdm.encryptsql.actors.Client;
 import eit.nl.utwente.sdm.encryptsql.actors.Server;
@@ -41,6 +42,12 @@ public class Demo {
 		Server s = new Server(r);
 		Client c = new Client(s, r);
 		
+		Random rn = new Random();
+		byte key[] = new byte[16];
+		for (int i = 0; i < 16; i++) {
+			key[i] = (byte)(rn.nextDouble() * 255);
+		}
+		c.setKey(key);
 		c.store(1, 100, 12, 30000, "INVEST_STOCK");
 	}
 	

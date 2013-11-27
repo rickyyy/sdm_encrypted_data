@@ -12,9 +12,9 @@ public class TestEncDec {
 	@Test
 	public void testEncDec() {
 		Random rn = new Random();
-		byte key[] = new byte[32];
-		for (int i = 0; i < 32; i++) {
-			key[i] = (byte)(rn.nextDouble() * 32);
+		byte key[] = new byte[16];
+		for (int i = 0; i < 16; i++) {
+			key[i] = (byte)(rn.nextDouble() * 255);
 		}
 		String encryptedB64 = EncryptionHelper.encrypt("Abracadabra", key);
 		String decrypt = EncryptionHelper.decrypt(encryptedB64, key);
