@@ -5,6 +5,7 @@ import java.util.Random;
 
 import eit.nl.utwente.sdm.encryptsql.actors.Client;
 import eit.nl.utwente.sdm.encryptsql.actors.Server;
+import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
 
 public class Demo {
@@ -39,7 +40,7 @@ public class Demo {
 		
 		Relation r = new Relation(attributes, domain, domainParts);
 		
-		Server s = new Server(r);
+		Server s = new Server(r, DBUtils.getDBConnection());
 		Client c = new Client(s, r);
 		
 		Random rn = new Random();
