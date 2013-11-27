@@ -13,8 +13,9 @@ TODO LIST:
 	++ Mapping functions
 	++ Fix String Conversion to Integers and Viceversa
 	++ Fix signed through a TODO on Relation.java for the "assignment of the mapped value" (look at the loop)
-	- Storing Encrypted Data 
+	++ Storing Encrypted Data 
 	- Decryption function
 	- Mapping Conditions
 	- Implementing Relationsal Operators over Encrypted Relations
 	- DB interaction
+	- GUI
