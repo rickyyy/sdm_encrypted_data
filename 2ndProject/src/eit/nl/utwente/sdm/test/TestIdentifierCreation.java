@@ -30,7 +30,7 @@ public class TestIdentifierCreation {
 		domainParts.add(3);
 		domainParts.add(6);
 		
-		Relation r = new Relation(attributes, domain);
+		Relation r = new Relation(attributes, domain, domainParts);
 		bucket = r.partitionFunction(attributes, domain, domainParts);
 		List<Partition> part1 = bucket.get("Id");
 		List<Partition> part2 = bucket.get("name");

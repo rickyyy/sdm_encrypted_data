@@ -1,6 +1,7 @@
 package eit.nl.utwente.sdm.encryptsql;
 
 public class Partition{
+	
 	private long lowerBound;
 	private long upperBound;
 	

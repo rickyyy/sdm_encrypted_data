@@ -1,12 +1,21 @@
-package eit.nl.utwente.sdm.encryptsql;
+package eit.nl.utwente.sdm.test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import eit.nl.utwente.sdm.encryptsql.Identifier;
+import eit.nl.utwente.sdm.encryptsql.Partition;
+import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
 
-public class Demo {
+public class TestEncAndStore {
 
-	public static void main(String[] args) {
+	@Test
+	public void simpleTest() {
 		ArrayList<String> attributes = new ArrayList<String>();
 		attributes.add("investment");
 		attributes.add("interest_rate");
@@ -28,6 +37,17 @@ public class Demo {
 		
 		Relation r = new Relation(attributes, domain, domainParts);
 		
+		List<Comparable> values = new ArrayList<Comparable>();
+		values.add(new Long(3000));
+		values.add(new Long(2));
+		values.add("Gambling");
+		ArrayList<String> mappingFunction = r.mappingFunction(values);
+		int i = 0;
+		System.out.println("The results:");
+		for (String mappedValue : mappingFunction) {
+			System.out.println(values.get(i++) + " " +  mappedValue);
+		}
+		Assert.assertSame(mappingFunction.size(), 3);
 	}
 	
 }

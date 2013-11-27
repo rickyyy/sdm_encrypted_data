@@ -5,37 +5,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
+
 
 
 /* In our Database we have financial_data which is already in "encrypted" form.
  * */
 public class Relation {
-	private List<String> Attributes;
-	private List<Long> maxDomain; //maximum value for that attribute
 	
-	
-	public Relation (List<String> att, List<Long> max){
-		this.Attributes = att;
-		this.maxDomain = max;
-	}
-	
-	public List<String> getAttributes(Relation r){
-		return r.Attributes;
-	}
-	
-	public List<Long> getMaxDomain() {
-		return maxDomain;
-	}
+	private HashMap<String, List<Partition>> bucket;
+	private HashMap<String, List<Identifier>> identificatioFunction;
+	private List<String> attributes;
 
-	public void setMaxDomain(List<Long> maxDomain) {
-		this.maxDomain = maxDomain;
+	public Relation (List<String> attributes, List<Long> domain, ArrayList<Integer> domainParts){
+		this.attributes = attributes;
+		bucket = partitionFunction(attributes, domain, domainParts);
+		identificatioFunction = identificatioFunction(bucket, attributes);
 	}
-
-	public void setAttributes(List<String> attributes) {
-		Attributes = attributes;
-	}
-	
-	public long attributesToInt(String s) {
+		
+	public static long attributesToInt(String s) {
 		long res = 0;
 		for(int i = 0; i<s.length(); i++){
 			res = res*76 + (int)s.charAt(i) - 47;
@@ -43,7 +31,7 @@ public class Relation {
 		return res;
 	}
 	
-	public String intToAttributes(long n) {
+	public static String intToAttributes(long n) {
 		String res = "";
 		do {
 			long charp =  n % 76;
@@ -53,23 +41,24 @@ public class Relation {
 		} while (n != 0);
 		return res;
 	}
-
-	public void addAttribute (Relation r, String s){
-		r.Attributes.add(s);
-	}
 	
-	public void addEtuple (Relation r, String s){
-		r.Attributes.add(0, s);
-	}
-	
-	public Relation store (Relation r, String etuple){
-		Relation rEncrypted = new Relation(r.Attributes, r.maxDomain);
-		for (String att : Attributes){
-			att.concat("_S");		// "_S" to underline the fact that is the "encrypted" version
+	public static long getUpperLimitString() {
+		String res = "";
+		String maxL = GlobalProperties.getInstance().getProperty("MAX_LENGTH_STRING");
+		for (int i = 0; i < Integer.parseInt(maxL); i++) {
+			res +='z';
 		}
-		rEncrypted.addEtuple(rEncrypted, etuple);
-		return rEncrypted;
+		return attributesToInt(res);
 	}
+	
+//	public Relation store (Relation r, String etuple){
+//		Relation rEncrypted = new Relation(r.Attributes, r.maxDomain);
+//		for (String att : Attributes){
+//			att.concat("_S");		// "_S" to underline the fact that is the "encrypted" version
+//		}
+//		rEncrypted.addEtuple(rEncrypted, etuple);
+//		return rEncrypted;
+//	}
 	
 	public HashMap<String, List<Partition>> partitionFunction (List<String> attributes, List<Long> maxDomain, List<Integer> domainParts){
 		
@@ -157,6 +146,7 @@ public class Relation {
 				Integer v = identValue.get(position);
 				Identifier ide = new Identifier(v);
 				ident.add(position, ide);
+				System.out.println(partition + " " + ide.getValue());
 			}
 			identifHshTbl.put(att, ident);
 		}
@@ -165,25 +155,30 @@ public class Relation {
 		
 	}
 	
-	
-	public ArrayList <String> mappingFunction(HashMap<String, List<Partition>> part, HashMap <String, List<Identifier>> ident, List<String> attributes){
+	public ArrayList <String> mappingFunction(List<Comparable> values){
 		ArrayList <String> mappedAttributes = new ArrayList<String>();
 		List<Partition> partTemp;
 		List<Identifier> identTemp;
-		long temp;
+		Comparable temp;
 		int position;
-		System.out.println("Attribute size = "+attributes.size());
-		for (String att : attributes){
-			temp = attributesToInt(att);	//transform string of attributes in Integer
-			partTemp = part.get(att);		//retrieve the set of partition for this attribute
-			identTemp = ident.get(att);		//retrieve the set of identifier for this attribute
-			System.out.println("inside for att");
+		System.out.println("Attribute size = "+values.size());
+		for (int i = 0; i < values.size(); i++){
+			Comparable value = values.get(i);
+			if (value instanceof String) {
+				temp = attributesToInt((String)value);	//transform string of attributes in Integer
+			} else {
+				temp = value;
+			}
+			String attribute = attributes.get(i);
+			partTemp = bucket.get(attribute);		//retrieve the set of partition for this attribute
+			identTemp = identificatioFunction.get(attribute);		//retrieve the set of identifier for this attribute
+//			System.out.println("inside for att");
 
-			for (Partition p : partTemp){	//TODO THERE IS AN ERROR HERE!!!
+			for (Partition p : partTemp) {	//TODO THERE IS AN ERROR HERE!!!
 				position = partTemp.indexOf(p);
-				System.out.println("inside for part");
-
-				if(temp <= p.getUpperBound() && temp >= p.getLowerBound()){
+//				System.out.println("inside for part");
+				
+				if((temp.compareTo(p.getUpperBound()) <= 0) && (temp.compareTo(p.getLowerBound()) >= 0)){
 					System.out.println("Debug mapping function check upper lower bound");
 					Integer val = identTemp.get(position).getValue();
 					mappedAttributes.add(String.valueOf(val));
@@ -192,6 +187,4 @@ public class Relation {
 		}
 		return mappedAttributes;	// return a list of mapped values of attributes using identifier and partition values
 	}
-	
-	
 }

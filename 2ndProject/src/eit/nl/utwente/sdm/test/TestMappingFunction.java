@@ -22,15 +22,17 @@ public class TestMappingFunction {
 		HashMap <String, List<Identifier>> identifHshTbl;
 		ArrayList<String> mappedAttributes;
 		ArrayList<String> attributes = new ArrayList<String>();
+		ArrayList<Comparable> attributesV = new ArrayList<Comparable>();
 		ArrayList<Long> domain = new ArrayList<Long>();
 		ArrayList<Integer> domainParts = new ArrayList<Integer>();
 		String string = "zorronezz";
-		
 		attributes.add("123");
+		attributesV.add("123");
 		int attPos = attributes.indexOf("123");
 		long x = 6428888932339941375L;
 		domain.add(x);
 		attributes.add(string);
+		attributesV.add(string);
 		int attPos1 = attributes.indexOf(string);
 		
 		domain.add(x);
@@ -38,12 +40,12 @@ public class TestMappingFunction {
 		domainParts.add(3);
 		domainParts.add(2);
 		
-		Relation r = new Relation(attributes, domain);
+		Relation r = new Relation(attributes, domain, domainParts);
 		bucket = r.partitionFunction(attributes, domain, domainParts);
 		List<Partition> part1 = bucket.get("123");
 		List<Partition> part2 = bucket.get(string);
 		identifHshTbl = r.identificatioFunction(bucket, attributes);
-		mappedAttributes = r.mappingFunction(bucket, identifHshTbl, attributes);
+		mappedAttributes = r.mappingFunction(attributesV);
 		System.out.println("Mapped attribute size : " + mappedAttributes.size());
 		String s = mappedAttributes.get(0);
 		System.out.println("Attribute Id:");

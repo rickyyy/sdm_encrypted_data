@@ -24,7 +24,7 @@ public class TestPartitionCreation {
 		domainParts.add(3);
 		domainParts.add(6);
 		
-		Relation r = new Relation(attributes, domain);
+		Relation r = new Relation(attributes, domain, domainParts);
 		bucket = r.partitionFunction(attributes, domain, domainParts);
 		List<Partition> res = bucket.get("Id");
 		List<Partition> res2 = bucket.get("name");
