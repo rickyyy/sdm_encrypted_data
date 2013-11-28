@@ -92,6 +92,8 @@ public class Server {
 	}
 	
 	public static String mapQuery(String oldQuery, Relation relation) {
+		if (!oldQuery.contains("where") && !oldQuery.contains("WHERE") )
+			return oldQuery;
 		WhereClause wc = Server.decodeWhereClause(oldQuery, relation.getAttributes());
 		String resultQuery = "select * from financial_data ";
 		long value = 0;
@@ -105,12 +107,54 @@ public class Server {
 			
 		if (wc.operator == '=') {
 			if (wc.secondIsAttr) {
+				List<Partition> partitionsAttr1 = relation.getPartitions(wc.elements[0]);
+				List<Identifier> identifiers1 = relation.getIdentifiers(wc.elements[0]);
+				List<Partition> partitionsAttr2 = relation.getPartitions(wc.elements[1]);
+				List<Identifier> identifiers2 = relation.getIdentifiers(wc.elements[1]);
+				boolean first = true;
+				for (int i = 0; i < partitionsAttr1.size(); i++) {
+					Partition p1 = partitionsAttr1.get(i);
+					for (int j = 0; j < partitionsAttr2.size(); j++) {
+						Partition p2 = partitionsAttr2.get(j);
+						if (p1.intersects(p2)) {
+							if (first) {
+								resultQuery += "where (" + wc.elements[0] + "_s=" + identifiers1.get(i).getValue() + " AND " + 
+										wc.elements[1] + "_s=" + identifiers2.get(j).getValue() + ")";
+								first = false;
+							} else {
+								resultQuery += " OR (" + wc.elements[0] + "_s=" + identifiers1.get(i).getValue() + " AND " + 
+										wc.elements[1] + "_s=" + identifiers2.get(j).getValue() + ")";
+							}
+						}
+					}
+				}
 			} else {
 				int mappedAttr = relation.mapSingleAttribute(wc.elements[0], value);
 				resultQuery += "where " + wc.elements[0] + "_s=" + mappedAttr;
 			}
 		} else if (wc.operator == '>') {
 			if (wc.secondIsAttr) {
+				List<Partition> partitionsAttr1 = relation.getPartitions(wc.elements[0]);
+				List<Identifier> identifiers1 = relation.getIdentifiers(wc.elements[0]);
+				List<Partition> partitionsAttr2 = relation.getPartitions(wc.elements[1]);
+				List<Identifier> identifiers2 = relation.getIdentifiers(wc.elements[1]);
+				boolean first = true;
+				for (int i = 0; i < partitionsAttr1.size(); i++) {
+					Partition p1 = partitionsAttr1.get(i);
+					for (int j = 0; j < partitionsAttr2.size(); j++) {
+						Partition p2 = partitionsAttr2.get(j);
+						if (p1.containsElementsGraterThan(p2)) {
+							if (first) {
+								resultQuery += "where (" + wc.elements[0] + "_s=" + identifiers1.get(i).getValue() + " AND " + 
+										wc.elements[1] + "_s=" + identifiers2.get(j).getValue() + ")";
+								first = false;
+							} else {
+								resultQuery += " OR (" + wc.elements[0] + "_s=" + identifiers1.get(i).getValue() + " AND " + 
+										wc.elements[1] + "_s=" + identifiers2.get(j).getValue() + ")";
+							}
+						}
+					}
+				}
 			} else {
 				List<Partition> partitions = relation.getPartitions(wc.elements[0]);
 				List<Identifier> identifiers = relation.getIdentifiers(wc.elements[0]);
@@ -129,6 +173,27 @@ public class Server {
 			}
 		} else if (wc.operator == '<') {
 			if (wc.secondIsAttr) {
+				List<Partition> partitionsAttr1 = relation.getPartitions(wc.elements[0]);
+				List<Identifier> identifiers1 = relation.getIdentifiers(wc.elements[0]);
+				List<Partition> partitionsAttr2 = relation.getPartitions(wc.elements[1]);
+				List<Identifier> identifiers2 = relation.getIdentifiers(wc.elements[1]);
+				boolean first = true;
+				for (int i = 0; i < partitionsAttr1.size(); i++) {
+					Partition p1 = partitionsAttr1.get(i);
+					for (int j = 0; j < partitionsAttr2.size(); j++) {
+						Partition p2 = partitionsAttr2.get(j);
+						if (p1.containsElementsLessThan(p2)) {
+							if (first) {
+								resultQuery += "where (" + wc.elements[0] + "_s=" + identifiers1.get(i).getValue() + " AND " + 
+										wc.elements[1] + "_s=" + identifiers2.get(j).getValue() + ")";
+								first = false;
+							} else {
+								resultQuery += " OR (" + wc.elements[0] + "_s=" + identifiers1.get(i).getValue() + " AND " + 
+										wc.elements[1] + "_s=" + identifiers2.get(j).getValue() + ")";
+							}
+						}
+					}
+				}
 			} else {
 				List<Partition> partitions = relation.getPartitions(wc.elements[0]);
 				List<Identifier> identifiers = relation.getIdentifiers(wc.elements[0]);

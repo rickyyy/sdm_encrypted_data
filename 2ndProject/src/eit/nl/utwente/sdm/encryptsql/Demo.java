@@ -13,6 +13,9 @@ import org.hsqldb.persist.HsqlProperties;
 import org.hsqldb.server.ServerAcl.AclFormatException;
 
 import eit.nl.utwente.sdm.encryptsql.actors.Client;
+import eit.nl.utwente.sdm.encryptsql.actors.Consultant;
+import eit.nl.utwente.sdm.encryptsql.guis.GUIClient;
+import eit.nl.utwente.sdm.encryptsql.guis.GUIConsultants;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
 
@@ -20,7 +23,7 @@ public class Demo {
 
 	public static void main(String[] args) {
 		ArrayList<String> attributes = new ArrayList<String>();
-		attributes.add("id_consultant");
+		attributes.add("id_cons");
 		attributes.add("id_client");
 		attributes.add("investment");
 		attributes.add("interest_rate");
@@ -55,18 +58,36 @@ public class Demo {
 		Relation r = new Relation(attributes, domain, domainParts);
 		Connection inMemoryDB = createInMemoryDBConn();
 		eit.nl.utwente.sdm.encryptsql.actors.Server s = new eit.nl.utwente.sdm.encryptsql.actors.Server(r, DBUtils.getDBConnection());
-		Client c = new Client(s, r, inMemoryDB);
-		
-		Random rn = new Random();
-		byte key[] = new byte[16];
-		for (int i = 0; i < 16; i++) {
-			key[i] = (byte) (rn.nextDouble() * 255);
+				
+		List<Client> clients = DBUtils.getClients();
+		List<byte[]> keys = new ArrayList<byte[]>();
+		List<Consultant> consultants = DBUtils.getConsultants();
+		for (Client client : clients) {
+			client.setServer(s);
+			client.setRelation(r);
+			client.setDB(inMemoryDB);
+			
+			Random rn = new Random();
+			byte key[] = new byte[16];
+			for (int i = 0; i < 16; i++) {
+				key[i] = (byte) (rn.nextDouble() * 255);
+			}
+			client.setKey(key);
+			keys.add(key);
 		}
-		c.setKey(key);
-		c.store(1, 100, 30000, 2, "INVEST_ST");
-		List<FinancialData> result = c.searchEncData("select * from financial_data where investment=30000");
-		System.out.println(result.size());
-		System.out.println(result.get(0).statement);
+		for (Consultant consultant : consultants) {
+			consultant.setServer(s);
+			consultant.setRelation(r);
+			consultant.setDb(inMemoryDB);
+			for (int i = 0; i < clients.size(); i++) {
+				Client c = clients.get(i);
+				if (c.getIdConsultant() == consultant.getId()) {
+					consultant.setKey(c.getId(), keys.get(i));
+				}
+			}
+		}
+		GUIClient guiClient = new GUIClient(clients);
+		GUIConsultants guiCon = new GUIConsultants(consultants);
 		
 	}
 

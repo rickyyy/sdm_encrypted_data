@@ -149,7 +149,7 @@ public class TestHSQLDB {
 		s.setKey(key);
 		Client c = new Client(s, r, conn);
 		c.setKey(key);
-		List<FinancialData> searchEncData = c.searchEncData("select * from financial_data where id < 10");
+		List<FinancialData> searchEncData = c.searchEncData("select * from financial_data where id<10");
 		Assert.assertSame(searchEncData.size(), 1);
 		Assert.assertSame(searchEncData.get(0).id, 1);
 		
@@ -172,7 +172,7 @@ public class TestHSQLDB {
 		@Override
 		public List<EncryptedFinancialData> executeQueryEncData(String sql) {
 			List<EncryptedFinancialData> result = new ArrayList<EncryptedFinancialData>();
-			String encrypt = EncryptionHelper.encrypt("1-10-10-2-10000-GAMBLING", key);
+			String encrypt = EncryptionHelper.encrypt("10-10-2-10000-GAMBLING", key);
 			List<Comparable> values = new ArrayList<Comparable>();
 			values.add(new Long(10));
 			values.add(new Long(10));
@@ -182,7 +182,7 @@ public class TestHSQLDB {
 			ArrayList<String> mappingFunction = r.mappingFunction(values);
 			EncryptedFinancialData efd = new EncryptedFinancialData(1, encrypt, mappingFunction.get(0), mappingFunction.get(1), mappingFunction.get(2), mappingFunction.get(3), mappingFunction.get(4));
 			result.add(efd);
-			encrypt = EncryptionHelper.encrypt("10-10-10-2-10000-GAMBLING", key);
+			encrypt = EncryptionHelper.encrypt("10-10-2-10000-GAMBLING", key);
 			values = new ArrayList<Comparable>();
 			values.add(new Long(10));
 			values.add(new Long(10));

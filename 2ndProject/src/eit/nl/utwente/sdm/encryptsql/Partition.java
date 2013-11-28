@@ -23,5 +23,30 @@ public class Partition{
 		return "Partition [lowerBound=" + lowerBound + ", upperBound="
 				+ upperBound + "]";
 	}
+
+	public boolean intersects(Partition p2) {
+		if (p2.lowerBound >= lowerBound && p2.lowerBound <= upperBound) {
+			return true;
+		}
+		if (p2.upperBound >= lowerBound && p2.upperBound <= upperBound) {
+			return true;
+		}
+		if (p2.lowerBound <= lowerBound && p2.upperBound >= upperBound) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean containsElementsLessThan(Partition p2) {
+		if (lowerBound <= p2.upperBound)
+			return true;
+		return false;
+	}
+
+	public boolean containsElementsGraterThan(Partition p2) {
+		if (upperBound >= p2.lowerBound)
+			return true;
+		return false;
+	}
 	
 }

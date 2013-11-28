@@ -58,7 +58,7 @@ public class DBUtils {
 		}
 	}
 
-	public static List<Client> getInsurances() {
+	public static List<Client> getClients() {
 		List<Client> result = new ArrayList<Client>();
 		Connection dbConnection = getDBConnection();
 		PreparedStatement insertData = null;
@@ -68,9 +68,10 @@ public class DBUtils {
 			ResultSet resultSet = insertData.executeQuery();
 			while (resultSet.next()) {
 				int id = resultSet.getInt(1);
-				String name = resultSet.getString(2);
-				String contact = resultSet.getString(3);
-				Client c = new Client(id, name, contact);
+				int idConsultant = resultSet.getInt(2);
+				String name = resultSet.getString(3);
+				String contact = resultSet.getString(4);
+				Client c = new Client(id, idConsultant, name, contact);
 				result.add(c);
 			}
 			return result;
@@ -80,8 +81,14 @@ public class DBUtils {
 		}
 	}
 	
-	public List<EncryptedFinancialData> getFinancialData() {
-		//TODO 
-		return null;
+	public static List<Client> getClientsForConsultant(Consultant c) {
+		List<Client> res = new ArrayList<Client>();
+		List<Client> clients = DBUtils.getClients();
+		for (Client client : clients) {
+			if (client.getIdConsultant() == c.getId()) {
+				res.add(client);
+			}
+		}
+		return res;
 	}
 }

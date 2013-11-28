@@ -25,7 +25,7 @@ public class TestSearchInEncData {
 	@Test
 	public void testSimpleSearch() {
 		ArrayList<String> attributes = new ArrayList<String>();
-		attributes.add("id_consultant");
+		attributes.add("id_cons");
 		attributes.add("id_client");
 		attributes.add("investment");
 		attributes.add("interest_rate");
@@ -69,7 +69,8 @@ public class TestSearchInEncData {
 		}
 		c.setKey(key);
 		c.store(1, 100, 30000, 2, "INVEST_ST");
-		c.store(1, 100, 3000, 5, "GAMBLING");
+		c.store(1, 3000, 3000, 5, "GAMBLING");
+		c.store(10, 300, 300, 5, "GAMBLING");
 		c.store(1, 100, 40000, 5, "STOCK");
 		c.store(1, 100, 15000, 5, "STOCK");
 		List<FinancialData> result = c.searchEncData("select * from financial_data where investment=30000");
@@ -80,13 +81,27 @@ public class TestSearchInEncData {
 		Assert.assertTrue(result.get(0).idCons == 1);
 		Assert.assertTrue(result.get(0).idClient == 100);
 		result = c.searchEncData("select * from financial_data where investment<30000");
-		Assert.assertSame(result.size(), 2);
+		Assert.assertSame(result.size(), 3);
 		result = c.searchEncData("select * from financial_data where investment>10");
-		Assert.assertSame(result.size(), 4);
+		Assert.assertSame(result.size(), 5);
 		result = c.searchEncData("select * from financial_data where investment<51000");
-		Assert.assertSame(result.size(), 4);
+		Assert.assertSame(result.size(), 5);
 		result = c.searchEncData("select * from financial_data where investment>14999");
 		Assert.assertSame(result.size(), 3);
+		result = c.searchEncData("select * from financial_data where investment=id_client");
+		Assert.assertSame(result.size(), 2);
+		result = c.searchEncData("select * from financial_data where id_client<investment");
+		Assert.assertSame(result.size(), 3);
+		result = c.searchEncData("select * from financial_data where interest_rate<investment");
+		Assert.assertSame(result.size(), 5);
+		result = c.searchEncData("select * from financial_data where id_cons<id_client");
+		Assert.assertSame(result.size(), 5);
+		result = c.searchEncData("select * from financial_data where id_cons>id_client");
+		Assert.assertSame(result.size(), 0);
+		result = c.searchEncData("select * from financial_data where investment>interest_rate");
+		Assert.assertSame(result.size(), 5);
+		result = c.searchEncData("select * from financial_data where id_cons>interest_rate");
+		Assert.assertSame(result.size(), 1);
 		
 	}
 

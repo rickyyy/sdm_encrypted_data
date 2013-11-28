@@ -8,57 +8,58 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
-
 import eit.nl.utwente.sdm.encryptsql.EncryptedFinancialData;
 import eit.nl.utwente.sdm.encryptsql.FinancialData;
 import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.EncryptionHelper;
 
-
 public class Client {
-	
+
 	private int id;
+	private int idConsultant;
 	private String name;
 	private String contact;
 	private byte key[];
 	private Server server;
 	private Relation relation;
 	private Connection db;
-	
+
 	public Client(Server s, Relation r, Connection inMemDB) {
 		this.server = s;
 		this.relation = r;
 		this.db = inMemDB;
 	}
-	
-	public Client(int id, String nm, String cnt){
+
+	public Client(int id, int idConsultant, String nm, String cnt) {
 		this.id = id;
-		this.name = name;
+		this.name = nm;
 		this.contact = cnt;
+		this.idConsultant = idConsultant;
 	}
-	public Client(String nm, String cnt){
+
+	public Client(String nm, int idConsultant, String cnt) {
+		this.idConsultant = idConsultant;
 		this.name = nm;
 		this.contact = cnt;
 	}
-	
-	public void setName(String newName){
+
+	public void setName(String newName) {
 		name = newName;
 	}
-	
-	public String getName (){
+
+	public String getName() {
 		return name;
 	}
-	
-	public void setContact(String newContact){
+
+	public void setContact(String newContact) {
 		contact = newContact;
 	}
-	
-	public String getContact(){
+
+	public String getContact() {
 		return contact;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -66,20 +67,20 @@ public class Client {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	public void persist() throws SQLException {
 		Connection dbConnection = null;
 		PreparedStatement insertData = null;
-		String insertString = "insert into "
-				+ "client"
-				+ "(name, contact) VALUES"
-				+ "(?,?)";
+		String insertString = "insert into " + "client"
+				+ "(id_consultant,name, contact) VALUES" + "(?,?,?)";
 
 		try {
 			dbConnection = DBUtils.getDBConnection();
-			insertData = dbConnection.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS);
-			insertData.setString(1, name);
-			insertData.setString(2, contact);
+			insertData = dbConnection.prepareStatement(insertString,
+					Statement.RETURN_GENERATED_KEYS);
+			insertData.setInt(1, idConsultant);
+			insertData.setString(2, name);
+			insertData.setString(3, contact);
 
 			// execute insert SQL statement
 			insertData.execute();
@@ -105,10 +106,10 @@ public class Client {
 
 		}
 	}
-	
+
 	public void delete() {
-		if (getId() == DBUtils.ID_NOT_SET) { 
-			//entity not yet persisted
+		if (getId() == DBUtils.ID_NOT_SET) {
+			// entity not yet persisted
 			return;
 		}
 		Connection dbConnection = null;
@@ -132,8 +133,9 @@ public class Client {
 	public void setKey(byte key[]) {
 		this.key = key;
 	}
-	
-	public String etuplePreparation (long idCons, long idClient, long interest, long investment, String statement){
+
+	public String etuplePreparation(long idCons, long idClient, long interest,
+			long investment, String statement) {
 		String s = "";
 		s += String.valueOf(idCons);
 		s += "-";
@@ -144,11 +146,12 @@ public class Client {
 		s += String.valueOf(investment);
 		s += "-";
 		s += statement;
-		
+
 		return s;
 	}
-	
-	public ArrayList<Comparable> preparationMapping (long idCons, long idClient, long interest, long investment, String statement){
+
+	public ArrayList<Comparable> preparationMapping(long idCons, long idClient,
+			long interest, long investment, String statement) {
 		ArrayList<Comparable> list = new ArrayList<Comparable>();
 		list.add(idCons);
 		list.add(idClient);
@@ -157,64 +160,77 @@ public class Client {
 		list.add(statement);
 		return list;
 	}
-	
-	public String preparationEFD (String s, ArrayList<String> mappedValues, int pos){
+
+	public String preparationEFD(String s, ArrayList<String> mappedValues,
+			int pos) {
 		s = s + mappedValues.get(pos);
 		return s;
 	}
-	
-	public void store(long idCons, long idClient, long interest, long investment, String statement) {
+
+	public void store(long idCons, long idClient, long investment,
+			long interest_rate, String statement) {
 		String s;
 		String etuple;
 		ArrayList<Comparable> listValues;
 		ArrayList<String> mappedValues;
-		
-		//Encryption of etuple		
+
+		// Encryption of etuple
 		System.out.println("Encrypting etuple: .....");
-		s = etuplePreparation(idCons, idClient, interest, investment, statement);
+		s = etuplePreparation(idCons, idClient, investment, interest_rate, statement);
 		System.out.println("Etuple: " + s);
 		etuple = EncryptionHelper.encrypt(s, this.key);
 		System.out.println("Enc etuple: " + etuple);
-		
-		//Mapping Function
+
+		// Mapping Function
 		System.out.println("Applying Mapping Function: .....");
-		listValues = preparationMapping(idCons, idClient, interest, investment, statement);
+		listValues = preparationMapping(idCons, idClient, investment, interest_rate,
+				statement);
 		System.out.println("ListValues = " + listValues);
 		mappedValues = relation.mappingFunction(listValues);
-		System.out.println("Mapped Values : " + mappedValues + "\nMapping Size : " + mappedValues.size());
-		
-		//create EncryptedFinancialData
+		System.out.println("Mapped Values : " + mappedValues
+				+ "\nMapping Size : " + mappedValues.size());
+
+		// create EncryptedFinancialData
 		System.out.println("Creating Encrypted Financial Data: .....");
-		String idConsEFD= mappedValues.get(0);
-		String idClientEFD= mappedValues.get(1);
+		String idConsEFD = mappedValues.get(0);
+		String idClientEFD = mappedValues.get(1);
 		String interestEFD = mappedValues.get(3);
 		String investmentEFD = mappedValues.get(2);
 		String statementEFD = mappedValues.get(4);
-		EncryptedFinancialData ed = new EncryptedFinancialData(etuple, idConsEFD, idClientEFD, interestEFD, investmentEFD, statementEFD);
+		EncryptedFinancialData ed = new EncryptedFinancialData(etuple,
+				idConsEFD, idClientEFD, interestEFD, investmentEFD,
+				statementEFD);
 		System.out.println("Id of consultant: " + idClientEFD);
 		System.out.println(ed.toString());
 		server.store(ed);
 	}
-	
+
 	public void setServer(Server server) {
 		this.server = server;
 	}
 
 	public List<FinancialData> searchEncData(String sql) {
 		/* Execute query on server side */
-		List<EncryptedFinancialData> resultFromServer = server.executeQueryEncData(sql);
+		List<EncryptedFinancialData> resultFromServer = server
+				.executeQueryEncData(sql);
 		System.out.println("RESULTS RECEIVED BY SERVER: " + resultFromServer);
-		/* Insert the values received from server in the virtual DB*/
-		String insertSQL = "insert into "
-				+ "financial_data"
-				+ "(id, statement, investment, interest_rate, id_client, id_cons) VALUES"
-				+ "(?,?,?,?,?,?)";
-		PreparedStatement insertStatement;
 		try {
-			insertStatement = db
-					.prepareStatement(insertSQL);
+			/* Clean virtual DB */
+			String deleteSql = "DELETE FROM financial_data";
+			PreparedStatement deleteSt = db.prepareStatement(deleteSql);
+			deleteSt.execute();
+
+			/* Insert the values received from server in the virtual DB */
+			String insertSQL = "insert into "
+					+ "financial_data"
+					+ "(id, statement, investment, interest_rate, id_client, id_cons) VALUES"
+					+ "(?,?,?,?,?,?)";
+			PreparedStatement insertStatement;
+
+			insertStatement = db.prepareStatement(insertSQL);
 			for (EncryptedFinancialData encFD : resultFromServer) {
-				String decryptedTouple = EncryptionHelper.decrypt(encFD.getEtuple(), key);
+				String decryptedTouple = EncryptionHelper.decrypt(
+						encFD.getEtuple(), key);
 				if (decryptedTouple != null) {
 					System.out.println("DECRYPTED ETUPLE: " + decryptedTouple);
 					List<String> etupleElements = getElementsOfEtuple(decryptedTouple);
@@ -231,10 +247,9 @@ public class Client {
 					System.out.println("INSERTED ONE ROW IN VIRTUAL TABLE");
 				}
 			}
-			/* Execute initial query on the virtual DB and return results*/
+			/* Execute initial query on the virtual DB and return results */
 			List<FinancialData> result = new ArrayList<FinancialData>();
-			PreparedStatement userSt = db
-					.prepareStatement(sql);
+			PreparedStatement userSt = db.prepareStatement(sql);
 			ResultSet resultSet = userSt.executeQuery();
 			while (resultSet.next()) {
 				int id = resultSet.getInt(1);
@@ -243,15 +258,11 @@ public class Client {
 				String statement = resultSet.getString(4);
 				int investment = resultSet.getInt(5);
 				int interestRate = resultSet.getInt(6);
-				FinancialData fd = new FinancialData(id, idCons, idClient, interestRate, investment, statement);
+				FinancialData fd = new FinancialData(id, idCons, idClient,
+						interestRate, investment, statement);
 				result.add(fd);
-			}	
-			
-			/* Clean virtual DB*/
-			String deleteSql = "DELETE FROM financial_data";
-			PreparedStatement deleteSt = db
-						.prepareStatement(deleteSql);
-			deleteSt.execute();	
+			}
+
 			return result;
 
 		} catch (SQLException e) {
@@ -266,5 +277,21 @@ public class Client {
 		for (String el : els)
 			result.add(el);
 		return result;
+	}
+
+	public int getIdConsultant() {
+		return idConsultant;
+	}
+
+	public void setIdConsultant(int idConsultant) {
+		this.idConsultant = idConsultant;
+	}
+
+	public void setRelation(Relation r) {
+		this.relation = r;
+	}
+
+	public void setDB(Connection inMemoryDB) {
+		this.db = inMemoryDB;
 	}
 }
