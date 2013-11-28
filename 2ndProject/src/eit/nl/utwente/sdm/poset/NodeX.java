@@ -1,7 +1,9 @@
 package eit.nl.utwente.sdm.poset;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
+
+import eit.nl.utwente.sdm.encryptsql.actors.Client;
+import eit.nl.utwente.sdm.encryptsql.actors.Consultant;
 
 //Every client is an independent User Class (following the definition in the paper)
 public class NodeX {
@@ -15,19 +17,29 @@ public class NodeX {
 	private ArrayList<NodeX> consultChildren;
 	private ArrayList<Edge> relations;
 
-	//Constructor for client user classes
+	//General Constructor
 	public NodeX(int clientOrConsId, int f){
 		this.identifier = clientOrConsId;
 		this.flag = f;
 	}
 	
-	public int getFlag() {
-		return flag;
+	public NodeX(Consultant c){
+		this.identifier = c.getId();
+		this.flag = 1;
+	}
+	
+	public NodeX(Client cl){
+		this.identifier = cl.getId();
+		this.flag = 2;
 	}
 
 	//Virtual node doesn't have any identifier.
 	public NodeX(int f){
 		this.flag = f;
+	}
+	
+	public int getFlag() {
+		return flag;
 	}
 	
 	public NodeX getParentConsul() {
@@ -94,4 +106,5 @@ public class NodeX {
 		return "NodeX [flag=" + flag + ", identifier=" + identifier + ", publicKey=" + publicKey
 				+ ", privateKey=" + privateKey + "]";
 	}
+	
 }

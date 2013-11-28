@@ -16,6 +16,7 @@ import eit.nl.utwente.sdm.poset.Poset;
 
 public class TestPosetNodeEdge {
 
+	//test done with general constructor of NodeX (for client and consultant)
 	@Test
 	public void test() {
 		ArrayList<NodeX> allNode = new ArrayList<NodeX>();
