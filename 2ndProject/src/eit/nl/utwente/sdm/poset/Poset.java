@@ -5,13 +5,11 @@ import java.util.ArrayList;
 public class Poset {
 	int id;	//To differentiate between different poset
 	ArrayList <NodeX> nodeList;	//correspond to the set H in the paper p.172
-	ArrayList <Edge> relation;
 	
 	//we assign the id of the Poset as id Consultant. Because client can have one consultant.
 	//So the consultant represents the poset.
-	public Poset(ArrayList<NodeX> nodes, ArrayList<Edge> edges, int idConsultant){
+	public Poset(ArrayList<NodeX> nodes, int idConsultant){
 		this.nodeList = nodes;
-		this.relation = edges;
 		this.id = idConsultant;
 	}
 	
@@ -23,24 +21,16 @@ public class Poset {
 		nodeList = h;
 	}
 
-	public ArrayList<Edge> getRelation() {
-		return relation;
-	}
-
-	public void setRelation(ArrayList<Edge> relation) {
-		this.relation = relation;
-	}
-
 	//returns the first node that covers x
-	public NodeX leftParent(Poset P, NodeX x){
-		NodeX leftParent = null;
-		return leftParent;
+	public NodeX virtualParent(Poset P, NodeX x){
+		NodeX virtualParent = x.getParentVirtual();
+		return virtualParent;
 	}
 	
 	//returns the last node that covers x
-	public NodeX rightParent(Poset P, NodeX x){
-		NodeX rightParent = null;
-		return rightParent;
+	public NodeX consultantParent(Poset P, NodeX x){
+		NodeX consultantParent = x.getParentConsul();
+		return consultantParent;
 	}
 	
 	//adds a relation x < y to P.
