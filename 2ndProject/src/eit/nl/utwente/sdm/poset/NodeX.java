@@ -15,7 +15,7 @@ public class NodeX {
 	private NodeX parentVirtual;
 	private NodeX virtualChildren;
 	private ArrayList<NodeX> consultChildren;
-	private ArrayList<Edge> relations;
+	private ArrayList<Edge> relations = new ArrayList<Edge>();
 
 	//General Constructor
 	public NodeX(int clientOrConsId, int f){
@@ -100,11 +100,52 @@ public class NodeX {
 	public void setPrivateKey(BigInteger privateKey) {
 		this.privateKey = privateKey;
 	}
+	
+	public byte[] getPrivateKeyByteArray() {
+		byte [] res = new byte[16];
+		for (int i = 0; i < 16; i++) {
+			res[i] = 0;
+		}
+		byte[] byteArray = privateKey.toByteArray();
+		for (int i = 0; i < res.length && i< byteArray.length; i++) {
+			res[i] = byteArray[i];
+		}
+		return res;
+	}
 
+	public byte[] getPublicKeyByteArray() {
+		byte [] res = new byte[16];
+		for (int i = 0; i < 16; i++) {
+			res[i] = 0;
+		}
+		byte[] byteArray = publicKey.toByteArray();
+		for (int i = 0; i < res.length && i< byteArray.length; i++) {
+			res[i] = byteArray[i];
+		}
+		return res;
+	}
 	@Override
 	public String toString() {
 		return "NodeX [flag=" + flag + ", identifier=" + identifier + ", publicKey=" + publicKey
 				+ ", privateKey=" + privateKey + "]";
+	}
+
+	public void addEdge(Edge edge) {
+		relations.add(edge);
+	}
+
+	public static byte[] computeKey(BigInteger privateKey2, BigInteger vPk) {
+		BigInteger secretChild = vPk.pow(privateKey2.intValue());
+		secretChild = secretChild.mod(CertifiedAuthority.prime);
+		byte byteArray[] = secretChild.toByteArray();
+		byte [] res = new byte[16];
+		for (int i = 0; i < 16; i++) {
+			res[i] = 0;
+		}
+		for (int i = 0; i < res.length && i< byteArray.length; i++) {
+			res[i] = byteArray[i];
+		}
+		return res;
 	}
 	
 }

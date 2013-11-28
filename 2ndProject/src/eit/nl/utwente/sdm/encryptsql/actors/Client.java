@@ -1,5 +1,6 @@
 package eit.nl.utwente.sdm.encryptsql.actors;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import eit.nl.utwente.sdm.encryptsql.FinancialData;
 import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.EncryptionHelper;
+import eit.nl.utwente.sdm.poset.NodeX;
 
 public class Client {
 
@@ -24,6 +26,8 @@ public class Client {
 	private Server server;
 	private Relation relation;
 	private Connection db;
+	private NodeX nodeX = null;
+	private NodeX virtualX = null;
 
 	public Client(Server s, Relation r, Connection inMemDB) {
 		this.server = s;
@@ -178,7 +182,13 @@ public class Client {
 		System.out.println("Encrypting etuple: .....");
 		s = etuplePreparation(idCons, idClient, investment, interest_rate, statement);
 		System.out.println("Etuple: " + s);
-		etuple = EncryptionHelper.encrypt(s, this.key);
+		byte key[];
+		if (nodeX == null) {
+			key = this.key;
+		} else {
+			key = nodeX.getPrivateKeyByteArray();
+		}
+		etuple = EncryptionHelper.encrypt(s, key);
 		System.out.println("Enc etuple: " + etuple);
 
 		// Mapping Function
@@ -226,7 +236,12 @@ public class Client {
 					+ "(id, statement, investment, interest_rate, id_client, id_cons) VALUES"
 					+ "(?,?,?,?,?,?)";
 			PreparedStatement insertStatement;
-
+			byte key[];
+			if (nodeX == null) {
+				key = this.key;
+			} else {
+				key = nodeX.getPrivateKeyByteArray();
+			}
 			insertStatement = db.prepareStatement(insertSQL);
 			for (EncryptedFinancialData encFD : resultFromServer) {
 				String decryptedTouple = EncryptionHelper.decrypt(
@@ -293,5 +308,25 @@ public class Client {
 
 	public void setDB(Connection inMemoryDB) {
 		this.db = inMemoryDB;
+	}
+
+	public void setNodeX(NodeX nodeX) {
+		this.nodeX = nodeX;
+	}
+
+	public void setVirtualNodeX(NodeX nodeX2) {
+		this.virtualX = nodeX2;
+	}
+
+	public NodeX getNodeX() {
+		return nodeX;
+	}
+
+	public NodeX getVirtualX() {
+		return virtualX;
+	}
+
+	public BigInteger getVirtualNodePk() {
+		return virtualX.getPublicKey();
 	}
 }

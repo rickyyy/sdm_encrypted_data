@@ -91,4 +91,14 @@ public class DBUtils {
 		}
 		return res;
 	}
+
+	public static Client getClientById(long idClient) {
+		List<Client> clients = DBUtils.getClients();
+		for (Client cl : clients) {
+			if (cl.getId() == idClient) { 
+				return cl;
+			}
+		}
+		return null;
+	}
 }

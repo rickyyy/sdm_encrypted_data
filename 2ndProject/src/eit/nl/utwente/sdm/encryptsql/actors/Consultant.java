@@ -15,6 +15,7 @@ import eit.nl.utwente.sdm.encryptsql.FinancialData;
 import eit.nl.utwente.sdm.encryptsql.Relation;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.EncryptionHelper;
+import eit.nl.utwente.sdm.poset.NodeX;
 
 public class Consultant {
 
@@ -25,6 +26,8 @@ public class Consultant {
 	private Server server;
 	private Relation relation;
 	private Connection db;
+	private NodeX nodeX = null;
+	private List<Client> clients;
 
 	public Consultant(int idCons, String nm, String cmp) {
 		this.id = idCons;
@@ -138,7 +141,19 @@ public class Consultant {
 		s = etuplePreparation(idCons, idClient, investment, interest_rate,
 				statement);
 		System.out.println("Etuple: " + s);
-		byte key[] = keys.get((int)idClient);
+		byte key[];
+		if (nodeX == null) {
+			key = keys.get((int) idClient);
+		} else {
+			Client client = null;
+			for (Client currClient : clients) {
+				if (currClient.getId() == idClient) {
+					client = currClient;
+				}
+			}
+			key = NodeX.computeKey(nodeX.getPrivateKey(),
+					client.getVirtualNodePk());
+		}
 		etuple = EncryptionHelper.encrypt(s, key);
 		System.out.println("Enc etuple: " + etuple);
 
@@ -235,25 +250,53 @@ public class Consultant {
 
 			insertStatement = getDb().prepareStatement(insertSQL);
 			for (EncryptedFinancialData encFD : resultFromServer) {
-				for (int client : keys.keySet()) {
-					byte key[] = keys.get(client);
-					String decryptedTouple = EncryptionHelper.decrypt(
-							encFD.getEtuple(), key);
-					if (decryptedTouple != null) {
-						System.out.println("DECRYPTED ETUPLE: "
-								+ decryptedTouple);
-						List<String> etupleElements = getElementsOfEtuple(decryptedTouple);
-						if (etupleElements.size() != 5) {
-							continue;
+				if (nodeX == null) {
+					for (int clientId : keys.keySet()) {
+						byte key[] = keys.get(clientId);
+						String decryptedTouple = EncryptionHelper.decrypt(
+								encFD.getEtuple(), key);
+						if (decryptedTouple != null) {
+							System.out.println("DECRYPTED ETUPLE: "
+									+ decryptedTouple);
+							List<String> etupleElements = getElementsOfEtuple(decryptedTouple);
+							if (etupleElements.size() != 5) {
+								continue;
+							}
+							insertStatement.setInt(1, encFD.getId());
+							insertStatement.setString(2, etupleElements.get(4));
+							insertStatement.setString(3, etupleElements.get(2));
+							insertStatement.setString(4, etupleElements.get(3));
+							insertStatement.setString(5, etupleElements.get(1));
+							insertStatement.setString(6, etupleElements.get(0));
+							insertStatement.execute();
+							System.out
+									.println("INSERTED ONE ROW IN VIRTUAL TABLE");
 						}
-						insertStatement.setInt(1, encFD.getId());
-						insertStatement.setString(2, etupleElements.get(4));
-						insertStatement.setString(3, etupleElements.get(2));
-						insertStatement.setString(4, etupleElements.get(3));
-						insertStatement.setString(5, etupleElements.get(1));
-						insertStatement.setString(6, etupleElements.get(0));
-						insertStatement.execute();
-						System.out.println("INSERTED ONE ROW IN VIRTUAL TABLE");
+					}
+				} else {
+					for (Client client : clients) {
+						byte key[] = NodeX.computeKey(nodeX.getPrivateKey(),
+								client.getVirtualNodePk());
+
+						String decryptedTouple = EncryptionHelper.decrypt(
+								encFD.getEtuple(), key);
+						if (decryptedTouple != null) {
+							System.out.println("DECRYPTED ETUPLE: "
+									+ decryptedTouple);
+							List<String> etupleElements = getElementsOfEtuple(decryptedTouple);
+							if (etupleElements.size() != 5) {
+								continue;
+							}
+							insertStatement.setInt(1, encFD.getId());
+							insertStatement.setString(2, etupleElements.get(4));
+							insertStatement.setString(3, etupleElements.get(2));
+							insertStatement.setString(4, etupleElements.get(3));
+							insertStatement.setString(5, etupleElements.get(1));
+							insertStatement.setString(6, etupleElements.get(0));
+							insertStatement.execute();
+							System.out
+									.println("INSERTED ONE ROW IN VIRTUAL TABLE");
+						}
 					}
 				}
 			}
@@ -295,6 +338,15 @@ public class Consultant {
 		for (String el : els)
 			result.add(el);
 		return result;
+	}
+
+	public void setNodeX(List<Client> clients, NodeX consultantNode) {
+		this.nodeX = consultantNode;
+		this.clients = clients;
+	}
+
+	public NodeX getNodeX() {
+		return nodeX;
 	}
 
 }

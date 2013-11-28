@@ -1,11 +1,14 @@
 package eit.nl.utwente.sdm.encryptsql;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.hsqldb.Server;
@@ -18,8 +21,12 @@ import eit.nl.utwente.sdm.encryptsql.guis.GUIClient;
 import eit.nl.utwente.sdm.encryptsql.guis.GUIConsultants;
 import eit.nl.utwente.sdm.encryptsql.helpers.DBUtils;
 import eit.nl.utwente.sdm.encryptsql.helpers.GlobalProperties;
+import eit.nl.utwente.sdm.poset.CertifiedAuthority;
+import eit.nl.utwente.sdm.poset.Edge;
+import eit.nl.utwente.sdm.poset.NodeX;
+import eit.nl.utwente.sdm.poset.Poset;
 
-public class Demo {
+public class DemoDHDistribution {
 
 	public static void main(String[] args) {
 		ArrayList<String> attributes = new ArrayList<String>();
@@ -61,30 +68,57 @@ public class Demo {
 				
 		List<Client> clients = DBUtils.getClients();
 		List<Consultant> consultants = DBUtils.getConsultants();
-		List<byte[]> keys = new ArrayList<byte[]>();
+		Map<Client, NodeX> clientNodes = new HashMap<Client, NodeX>();
+		Map<Client, NodeX> virtualNodes = new HashMap<Client, NodeX>();
 		for (Client client : clients) {
 			client.setServer(s);
 			client.setRelation(r);
 			client.setDB(inMemoryDB);
-			
-			Random rn = new Random();
-			byte key[] = new byte[16];
-			for (int i = 0; i < 16; i++) {
-				key[i] = (byte) (rn.nextDouble() * 255);
-			}
-			client.setKey(key);
-			keys.add(key);
+			NodeX clientNode = new NodeX(client);
+			NodeX virtualNode = new NodeX(0);
+			clientNode.setParentVirtual(virtualNode);
+			Edge edge = new Edge(virtualNode, clientNode);
+			clientNode.addEdge(edge);
+			virtualNode.addEdge(edge);
+			clientNodes.put(client, clientNode);
+			virtualNodes.put(client, virtualNode);
 		}
+		CertifiedAuthority ca = new CertifiedAuthority();
 		for (Consultant consultant : consultants) {
+			ArrayList<NodeX> posetNodes = new ArrayList<NodeX>();
+			NodeX consultantNode = new NodeX(consultant);
+			posetNodes.add(consultantNode);
 			consultant.setServer(s);
 			consultant.setRelation(r);
 			consultant.setDb(inMemoryDB);
-			for (int i = 0; i < clients.size(); i++) {
-				Client c = clients.get(i);
-				if (c.getIdConsultant() == consultant.getId()) {
-					consultant.setKey(c.getId(), keys.get(i));
+			ArrayList<NodeX> children = new ArrayList<NodeX>();
+			List<Client> childrenClients = new ArrayList<Client>();
+			for (Client client : clients) {
+				if (consultant.getId() == client.getIdConsultant()) {
+					NodeX clientNode = clientNodes.get(client);
+					clientNode.setParentConsul(consultantNode);
+					Edge edge = new Edge(consultantNode, clientNode);
+					clientNode.addEdge(edge);
+					consultantNode.addEdge(edge);
+					posetNodes.add(clientNode);
+					posetNodes.add(virtualNodes.get(client));
+					children.add(clientNode);
+					childrenClients.add(client);
 				}
 			}
+			consultantNode.setConsultChildren(children);
+			Poset p = new Poset(posetNodes, consultantNode.getIdentifier());
+			BigInteger g = ca.keyAssignment(p);
+			consultant.setNodeX(childrenClients, consultantNode);
+			for (Client cl : childrenClients) {
+				cl.setNodeX(clientNodes.get(cl));
+				cl.setVirtualNodeX(virtualNodes.get(cl));
+			}
+		}
+		for (Client cl : clients) {
+			System.out.println(cl.getName() + " keys");
+			System.out.println(cl.getNodeX().getPrivateKey() + " " + cl.getNodeX().getPublicKey());
+			System.out.println(cl.getVirtualX().getPrivateKey() + " " + cl.getVirtualX().getPublicKey());
 		}
 		GUIClient guiClient = new GUIClient(clients);
 		GUIConsultants guiCon = new GUIConsultants(consultants);
